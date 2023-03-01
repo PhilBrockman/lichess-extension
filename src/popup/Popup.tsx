@@ -37,18 +37,6 @@ function App() {
         setActiveTab(0)
       }
     })
-
-    // Get the active tab
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      // Send a message to the background script to inject the popup into the active tab
-      chrome.runtime.sendMessage({ type: 'injectPopup', tabId: tabs[0].id }, function (response) {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError)
-        } else {
-          console.log('Popup injected successfully')
-        }
-      })
-    })
   }, [])
   useEffect(() => {
     if (pieces === undefined) return
