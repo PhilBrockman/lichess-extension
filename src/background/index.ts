@@ -1,3 +1,8 @@
-console.info('chrome-ext template-react-ts background script')
-console.log('hie bg bg')
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  // if (message.domCount) {
+  //   // do something with the count
+  // }
+  console.log('message', message)
+})
+
 export {}
