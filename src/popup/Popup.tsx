@@ -4,10 +4,12 @@ import { SerializedChessPiece } from './types'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 
 const PIECES_THAT_CAN_BE_HIDDEN = 'PIECES_THAT_CAN_BE_HIDDEN'
+const ACTIVE_TAB_INDEX = 'ACTIVE_TAB_INDEX'
 
 function App() {
   const [pieces, setPieces] = useState<string[]>()
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
+  const [activeTab, setActiveTab] = useState<number>()
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -27,8 +29,27 @@ function App() {
         setPieces(['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'])
       }
     })
-  }, [])
 
+    chrome.storage.local.get(ACTIVE_TAB_INDEX, function (result) {
+      if (result[ACTIVE_TAB_INDEX]) {
+        setActiveTab(result[ACTIVE_TAB_INDEX])
+      } else {
+        setActiveTab(0)
+      }
+    })
+
+    // Get the active tab
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      // Send a message to the background script to inject the popup into the active tab
+      chrome.runtime.sendMessage({ type: 'injectPopup', tabId: tabs[0].id }, function (response) {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError)
+        } else {
+          console.log('Popup injected successfully')
+        }
+      })
+    })
+  }, [])
   useEffect(() => {
     if (pieces === undefined) return
     chrome.storage.local.set({ [PIECES_THAT_CAN_BE_HIDDEN]: JSON.stringify(pieces) })
@@ -40,10 +61,44 @@ function App() {
     })
   }, [pieces])
 
+  const content = [
+    {
+      label: 'Settings',
+      content: <>{pieces && <PiecesCheckBoxes pieces={pieces} onChange={setPieces} />}</>,
+    },
+    {
+      label: 'Hidden Pieces',
+      content: <>{hiddenPieces && <HiddenPieces pieces={hiddenPieces} />}</>,
+    },
+  ]
+
   return (
-    <main className="bg-red-400">
-      {pieces && <PiecesCheckBoxes pieces={pieces} onChange={setPieces} />}
-      {hiddenPieces && <HiddenPieces pieces={hiddenPieces} />}
+    <main>
+      <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+        <ul className="flex flex-row -mb-px">
+          {content.map((tab, index) => {
+            const isActive = index === activeTab
+            const regularClasses =
+              'inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 cursor-pointer'
+            const activeClasses =
+              'inline-block p-4 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500'
+
+            return (
+              <li
+                key={tab.label}
+                className={isActive ? activeClasses : regularClasses}
+                onClick={() => {
+                  setActiveTab(index)
+                  chrome.storage.local.set({ [ACTIVE_TAB_INDEX]: index })
+                }}
+              >
+                {tab.label}
+              </li>
+            )
+          })}
+        </ul>
+        {activeTab !== undefined && content[activeTab]?.content}
+      </div>
     </main>
   )
 }

@@ -130,7 +130,7 @@ const hidePieces = () => {
   pieces.forEach((piece) => {
     // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
     if (PIECES_THAT_I_CAN_HIDE.some((pieceName) => piece.className.includes(pieceName))) {
-      piece.style.opacity = '.3'
+      piece.style.opacity = '0'
       hiddenPieces.push(getChessPieceLocation(piece))
     } else {
       piece.style.opacity = '1'

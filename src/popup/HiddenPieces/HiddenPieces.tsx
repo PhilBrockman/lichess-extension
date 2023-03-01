@@ -12,9 +12,12 @@ export function HiddenPieces({
 }) {
   return (
     <div className="flex flex-col">
-      {pieces.map((piece) => (
-        <HiddenPiece key={`${piece.row}${piece.column}`} {...piece} />
-      ))}
+      {pieces.map(
+        (piece) =>
+          piece &&
+          piece.row &&
+          piece.column && <HiddenPiece key={`${piece.row}${piece.column}`} {...piece} />,
+      )}
     </div>
   )
 }
