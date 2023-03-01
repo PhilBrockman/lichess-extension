@@ -38,6 +38,5 @@ export default defineManifest({
     'scripting', // Allows content scripts to run
     'background', // Allows background workers to run
     'storage', // Allows access to the browser's storage API
-    '<all_urls>', // Allows access to all URLs],
   ],
 })
