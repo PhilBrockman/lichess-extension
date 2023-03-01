@@ -47,7 +47,7 @@ const createObservations = (callback: () => void) => {
 }
 
 function App() {
-  const [pieces, setPieces] = useState<string[]>([])
+  const [pieces, setPieces] = useState<string[]>()
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
   const [activeTab, setActiveTab] = useState<number>(0)
   const handleUpdateHiddenPieces = () => {}
@@ -59,6 +59,7 @@ function App() {
     const observer = createObservations(handleUpdateHiddenPieces)
     // load in pieces from chrome storage
     chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, ACTIVE_TAB_INDEX], (result) => {
+      console.log('result', result)
       if (result[PREFERRED_HIDDEN_PIECES]) {
         setPieces(result[PREFERRED_HIDDEN_PIECES])
       }
@@ -76,6 +77,11 @@ function App() {
     // update chrome storage
     chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
   }, [pieces])
+
+  useEffect(() => {
+    // update chrome storage
+    chrome.storage.sync.set({ [ACTIVE_TAB_INDEX]: activeTab })
+  }, [activeTab])
 
   return (
     <div className="absolute left-0 top-16" style={{ zIndex: 1000 }}>

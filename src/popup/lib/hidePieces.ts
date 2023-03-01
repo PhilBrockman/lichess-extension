@@ -105,8 +105,8 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE: any) => {
   const hiddenPieces = []
   pieces.forEach((piece) => {
     // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
-    if (PIECES_THAT_I_CAN_HIDE.some((pieceName) => piece.className.includes(pieceName))) {
-      piece.style.opacity = '0'
+    if (PIECES_THAT_I_CAN_HIDE?.some((pieceName) => piece.className.includes(pieceName))) {
+      piece.style.opacity = '.20'
       console.log('hiding')
       hiddenPieces.push(getChessPieceLocation(piece))
     } else {
