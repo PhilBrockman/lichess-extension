@@ -4,17 +4,17 @@ import PieceCheckBox from './PieceCheckBox'
 const pieceTypes = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king']
 
 const ALL_HIDDEN = {
-  label: 'Fully pieceless',
-  helper: 'Hide all pieces',
+  label: 'Board only',
+  helper: 'Hide all game pieces',
   data: ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'],
 }
 const PAWNS_ONLY = {
-  label: 'Pawns-only',
-  helper: 'Hide all pieces except pawns',
+  label: 'Pawns rule',
+  helper: 'Only pawns will be visible',
   data: ['rook', 'knight', 'bishop', 'queen', 'king'],
 }
 const KINGS_ROOKS_AND_QUEENS = {
-  label: 'Throneless',
+  label: 'Revolution',
   helper: 'Hide all pieces except kings and queens',
   data: ['queen', 'king'],
 }
