@@ -20,6 +20,22 @@ export function HiddenPiece(piece: SerializedChessPiece) {
     const searchX = boardx + x
     const searchY = boardy + y
 
+    console.log({
+      x,
+      y,
+      boardx,
+      boardy,
+      searchX,
+      searchY,
+    })
+
+    // create a letter a and place it at x, y
+    const a = document.createElement('div')
+    a.className = 'absolute left-0 top-0'
+    a.style.transform = `translate(${x}px, ${y}px)`
+    a.innerHTML = 'a'
+    document.body.appendChild(a)
+
     const elements = document.getElementsByTagName('piece')
     const aboveElements = []
     for (let i = 0; i < elements.length; i++) {
@@ -27,7 +43,7 @@ export function HiddenPiece(piece: SerializedChessPiece) {
       const rect = element.getBoundingClientRect()
 
       // Check if the element's top-left corner is above the search location
-      if (rect.top < searchY && rect.left < searchX) {
+      if (rect.top < y && rect.left < x) {
         aboveElements.push(element)
       }
     }
@@ -52,5 +68,3 @@ export function HiddenPiece(piece: SerializedChessPiece) {
     </div>
   )
 }
-
-;<piece class="black rook" style="transform: translate(142px, 497px); opacity: 1;"></piece>
