@@ -8,8 +8,8 @@ const ACTIVE_TAB_INDEX = 'ACTIVE_TAB_INDEX'
 
 function App() {
   const [pieces, setPieces] = useState<string[]>()
-  const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
-  const [activeTab, setActiveTab] = useState<number>()
+  const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>([])
+  const [activeTab, setActiveTab] = useState<number>(0)
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -41,12 +41,12 @@ function App() {
   useEffect(() => {
     if (pieces === undefined) return
     chrome.storage.local.set({ [PIECES_THAT_CAN_BE_HIDDEN]: JSON.stringify(pieces) })
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      if (!tabs[0]?.id) return
-      chrome.tabs.sendMessage(tabs[0].id, { type: 'setPieces', pieces }, function (response) {
-        console.log(response)
-      })
-    })
+    // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    //   if (!tabs[0]?.id) return
+    //   chrome.tabs.sendMessage(tabs[0].id, { type: 'setPieces', pieces }, function (response) {
+    //     console.log(response)
+    //   })
+    // })
   }, [pieces])
 
   const content = [

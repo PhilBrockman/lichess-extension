@@ -1,3 +1,18 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from '../popup/Popup'
+
+// Create a container element in the DOM where you can render your component
+const container = document.createElement('div')
+document.body.appendChild(container)
+
+// Render your React component into the container element
+ReactDOM.createRoot(container).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
 console.info('chrome-ext template-react-ts content script')
 // select the piece element
 const board = document.querySelector('cg-board')
@@ -145,22 +160,22 @@ const hidePieces = () => {
   return hiddenPieces
 }
 
-chrome.runtime.sendMessage({ action: 'injectPopup' }, function (response) {
-  console.log(response)
-})
+// chrome.runtime.sendMessage({ action: 'injectPopup' }, function (response) {
+//   console.log(response)
+// })
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.type === 'setPieces') {
     PIECES_THAT_I_CAN_HIDE = request.pieces
     hidePieces()
   }
-  if (request.action === 'getPopupContent') {
-    fetch(chrome.runtime.getURL('popup.html'))
-      .then((response) => response.text())
-      .then((html) => sendResponse(html))
-      .catch((error) => console.error(error))
-    return true // Tell Chrome that we want to send a response asynchronously
-  }
+  // if (request.action === 'getPopupContent') {
+  //   fetch(chrome.runtime.getURL('../../popup.html'))
+  //     .then((response) => response.text())
+  //     .then((html) => sendResponse(html))
+  //     .catch((error) => console.error(error))
+  //   return true // Tell Chrome that we want to send a response asynchronously
+  // }
 })
 
 chrome.storage.local.get('PIECES_THAT_CAN_BE_HIDDEN', function (result) {
@@ -170,4 +185,5 @@ chrome.storage.local.get('PIECES_THAT_CAN_BE_HIDDEN', function (result) {
   }
 })
 
-export {}
+// export {}
+//
