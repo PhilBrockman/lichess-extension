@@ -145,10 +145,21 @@ const hidePieces = () => {
   return hiddenPieces
 }
 
+chrome.runtime.sendMessage({ action: 'injectPopup' }, function (response) {
+  console.log(response)
+})
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.type === 'setPieces') {
     PIECES_THAT_I_CAN_HIDE = request.pieces
     hidePieces()
+  }
+  if (request.action === 'getPopupContent') {
+    fetch(chrome.runtime.getURL('popup.html'))
+      .then((response) => response.text())
+      .then((html) => sendResponse(html))
+      .catch((error) => console.error(error))
+    return true // Tell Chrome that we want to send a response asynchronously
   }
 })
 
