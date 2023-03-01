@@ -42,7 +42,7 @@ const Preset = ({
   isActive: boolean
 }) => {
   return (
-    <div key={preset.label} className="flex flex-col gap-1">
+    <div key={preset.label} className="flex flex-col gap-1 group">
       <button
         className={
           !isActive
@@ -54,7 +54,7 @@ const Preset = ({
         {isActive && <span className="mr-1">✓</span>}
         {preset.label}
       </button>
-      <span className="text-xs text-gray-500">{preset.helper}</span>
+      <span className="text-xs text-gray-400 group-hover:text-gray-600">{preset.helper}</span>
     </div>
   )
 }
@@ -101,7 +101,7 @@ export default function PiecesCheckBoxes({
               <PieceCheckBox
                 key={pieceType}
                 pieceType={pieceType}
-                isChecked={checkedPieces.includes(pieceType)}
+                isChecked={!checkedPieces.includes(pieceType)}
                 onChange={(pieceType) => {
                   if (checkedPieces.includes(pieceType)) {
                     setCheckedPieces(checkedPieces.filter((p) => p !== pieceType))

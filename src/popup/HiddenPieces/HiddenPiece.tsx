@@ -1,3 +1,5 @@
+import { boardElement } from '../Popup'
+import { getTransformationFromChessNotation } from '../lib/hidePieces'
 import { SerializedChessPiece } from '../types'
 
 export function HiddenPiece(piece: SerializedChessPiece) {
@@ -7,7 +9,33 @@ export function HiddenPiece(piece: SerializedChessPiece) {
   }.png`
 
   const handleClick = () => {
-    console.log(piece)
+    const {
+      translate: { x, y },
+    } = getTransformationFromChessNotation(piece.column, piece.row)
+
+    const rect = boardElement.getBoundingClientRect()
+    const boardx = rect.left + window.scrollX
+    const boardy = rect.top + window.scrollY
+
+    const searchX = boardx + x
+    const searchY = boardy + y
+
+    const elements = document.getElementsByTagName('piece')
+    const aboveElements = []
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i]
+      const rect = element.getBoundingClientRect()
+
+      // Check if the element's top-left corner is above the search location
+      if (rect.top < searchY && rect.left < searchX) {
+        aboveElements.push(element)
+      }
+    }
+
+    // The aboveElements array now contains all elements that are above the search location
+    console.log(aboveElements)
+
+    //
   }
 
   return (
@@ -24,3 +52,5 @@ export function HiddenPiece(piece: SerializedChessPiece) {
     </div>
   )
 }
+
+;<piece class="black rook" style="transform: translate(142px, 497px); opacity: 1;"></piece>

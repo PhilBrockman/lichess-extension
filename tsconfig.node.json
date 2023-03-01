@@ -6,5 +6,5 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react"
   },
-  "include": ["vite.config.ts", "src/**/*.ts", "src/**/*.tsx", "src/content/index.tsx"]
+  "include": ["vite.config.ts", "src/**/*.ts"]
 }
