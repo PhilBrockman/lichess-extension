@@ -32,5 +32,12 @@ export default defineManifest({
       matches: [],
     },
   ],
-  permissions: [],
+  permissions: [
+    'tabs', // Allows access to the tabs API
+    'activeTab', // Allows access to the currently active tab
+    'scripting', // Allows content scripts to run
+    'background', // Allows background workers to run
+    'storage', // Allows access to the browser's storage API
+    '<all_urls>', // Allows access to all URLs],
+  ],
 })
