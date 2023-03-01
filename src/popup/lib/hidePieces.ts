@@ -53,20 +53,6 @@ export function getTransformationFromChessNotation(columnAsLetter: string, row: 
   const x = (columnAsLetter.charCodeAt(0) - 97) * squareSize
   const y = (8 - row) * squareSize
 
-  const elements = document.getElementsByTagName('piece')
-  const aboveElements = []
-  for (let i = 0; i < elements.length; i++) {
-    const element = elements[i]
-    const rect = element.getBoundingClientRect()
-
-    // Check if the element's top-left corner is above the search location
-    if (rect.top < searchY && rect.left < searchX) {
-      aboveElements.push(element)
-    }
-  }
-
-  // The aboveElements array now contains all elements that are above the search location
-  console.log(aboveElements)
   return {
     translate: {
       x,
