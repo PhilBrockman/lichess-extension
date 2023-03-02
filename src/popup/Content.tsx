@@ -37,17 +37,6 @@ export function Content({
     //   })
     //   updateHiddenPieces()
     // }
-    // const obs1 = createObservations(creationCallback)
-    // const obs2 = createAnimationEndObservations(() => {
-    //   console.count('animation end')
-    //   updateHiddenPieces()
-    // })
-    // console.log('creating observations', { obs1, obs2 })
-    // return () => {
-    //   // cleanup the observer
-    //   obs1.disconnect()
-    //   obs2.disconnect()
-    // }
   }, [pieces])
 
   const content = [

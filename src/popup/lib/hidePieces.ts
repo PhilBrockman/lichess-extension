@@ -64,7 +64,7 @@ export function getTransformationFromChessNotation(columnAsLetter: string, row: 
 }
 
 function getTransformDirections(transform) {
-  const regex = /translate\((-?\d+)px,\s*(-?\d+)px\)/
+  const regex = /translate\((.+)px,\s*(.+)px\)/
   const match = transform.match(regex)
 
   if (!match) {
