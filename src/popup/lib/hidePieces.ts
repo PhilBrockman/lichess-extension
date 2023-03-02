@@ -101,7 +101,8 @@ function getChessPieceLocation(piece): SerializedChessPiece {
   }
 }
 
-export const hidePieces = (PIECES_THAT_I_CAN_HIDE: any) => {
+export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: string[]) => {
+  // console.count('hiding pieces')
   const pieces = document.querySelectorAll('piece')
   const hiddenPieces = []
   pieces.forEach((piece) => {

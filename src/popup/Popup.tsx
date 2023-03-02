@@ -3,10 +3,10 @@ import PiecesCheckBoxes from './Pieces/PiecesCheckBoxes'
 import { SerializedChessPiece } from './types'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 import { hidePieces } from './lib/hidePieces'
+import _ from 'lodash'
 
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES'
 const ACTIVE_TAB_INDEX = 'ACTIVE_TAB_INDEX'
-export const boardElement = document.querySelector('cg-board')
 
 function areElementsOverlapping(element1: HTMLElement, element2: HTMLElement) {
   const rect1 = element1.getBoundingClientRect()
@@ -29,51 +29,39 @@ function areElementsOverlapping(element1: HTMLElement, element2: HTMLElement) {
 
   return overlapArea / totalArea >= 0.95
 }
-
-export const createObservations = (callback: () => void) => {
-  const historyBar = document.querySelector('div.puzzle__session')
-  console.log({ historyBar })
-  // fire an alert whenever an "a" element is added to the DOM
-  const observer = new MutationObserver((mutationsList) => {
-    // loop through each mutation that occurred
-    for (let mutation of mutationsList) {
-      // check if a piece element was added or removed
-      console.log(mutation.target)
-      if (mutation.target.nodeName === 'A') {
-        console.log('a element added to DOM')
-        callback()
-      }
-    }
-  })
-
-  // start observing the chessboard element
-  observer.observe(historyBar, { attributes: true, childList: true, subtree: true })
-
-  return observer
-}
-export const createAnimationEndObservations = (callback: () => void) => {
-  // create a new observer
-  const observer = new MutationObserver((mutationsList) => {
-    const lastMoves = document.querySelectorAll('square.last-move')
-    // loop through each mutation that occurred
-    for (let mutation of mutationsList) {
-      // check if a piece element was added or removed
-      if (mutation.target.nodeName === 'PIECE') {
-        // check if the anim class was added or removed
-        if (!mutation.target.classList.contains('anim')) {
-          lastMoves.forEach((lastMove) => {
-            if (areElementsOverlapping(mutation.target, lastMove)) {
-              // console.log('anim class removed from piece', mutation.target)
-              callback()
-            }
-          })
+const basicObserver = ({ callback }: { callback: (target: any) => void }) => {
+  const observer = new MutationObserver((mutationsList, observer) => {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList') {
+        // Check if a <piece> element was added or removed
+        for (const node of mutation.addedNodes) {
+          if (node.tagName === 'PIECE') {
+            // console.log('A <piece> element was added to the <cg-board>!')
+            callback(mutation.target)
+          }
+        }
+        for (const node of mutation.removedNodes) {
+          if (node.tagName === 'PIECE') {
+            // console.log('A <piece> element was removed from the <cg-board>!')
+            callback(mutation.target)
+          }
+        }
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        // Check if the 'anim' class was removed from a <piece> element
+        const target = mutation.target
+        if (target.tagName === 'PIECE' && !target.classList.contains('anim')) {
+          // console.log("The 'anim' class was removed from a <piece> element!")
+          callback(mutation.target)
         }
       }
     }
   })
 
-  // start observing the chessboard element
-  observer.observe(boardElement, { attributes: true, childList: true, subtree: true })
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }
+
+  // Start observing the target node for configured mutations
+  observer.observe(document.body, config)
   return observer
 }
 
@@ -83,7 +71,6 @@ function App() {
   const [activeTab, setActiveTab] = useState<number>()
 
   useEffect(() => {
-    console.log('loading state')
     // load in pieces from chrome storage
     chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, ACTIVE_TAB_INDEX], (result) => {
       if (result[PREFERRED_HIDDEN_PIECES]) {
@@ -96,29 +83,31 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const handleUpdateHiddenPieces = () => {
-      setHiddenPieces(hidePieces(pieces))
-    }
-    // update chrome storage
-    chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
-    const obs1 = createObservations(() => {
-      handleUpdateHiddenPieces()
+    console.log('creating observers')
+    const obs3 = basicObserver({
+      callback: _.debounce(
+        () => {
+          console.count('--->')
+          setHiddenPieces(hidePieces(pieces))
+        },
+        500,
+        { leading: true },
+      ),
     })
-    const obs2 = createAnimationEndObservations(() => {
-      // console.count('animation end')
-      handleUpdateHiddenPieces()
-    })
-    handleUpdateHiddenPieces()
     return () => {
-      // cleanup the observer
-      obs1?.disconnect()
-      obs2?.disconnect()
+      console.error('disconnecting observers')
+      obs3?.disconnect()
     }
   }, [pieces])
 
   useEffect(() => {
-    console.log('active tab changed, updating hidden pieces')
     // update chrome storage
+    console.log('updtangi storage')
+    chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
+    setHiddenPieces(hidePieces(pieces))
+  }, [pieces])
+
+  useEffect(() => {
     chrome.storage.sync.set({ [ACTIVE_TAB_INDEX]: activeTab })
   }, [activeTab])
 
@@ -169,7 +158,7 @@ const Content = ({
   ]
   return (
     <>
-      <ul className="flex flex-row -mb-px">
+      <ul className="flex flex-row -mb-px bg-gray-200">
         {content.map((tab, index) => {
           const isActive = index === activeTab
           const regularClasses =
