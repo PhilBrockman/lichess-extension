@@ -7,31 +7,18 @@ import { hidePieces } from './lib/hidePieces'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES'
 const ACTIVE_TAB_INDEX = 'ACTIVE_TAB_INDEX'
 export const boardElement = document.querySelector('cg-board')
+
 export const createObservations = (callback: () => void) => {
   const observerCallback = function (mutationsList, observer) {
     for (const mutation of mutationsList) {
-      if (
-        mutation.type === 'attributes' &&
-        mutation.attributeName === 'style' &&
-        !mutation.target.className.includes('dragging') &&
-        !mutation.target.className.includes('anim') &&
-        // !mutation.target.className.includes('last-move') &&
-        !mutation.target.className.includes('move-dest')
-      ) {
-        console.log({
-          callback,
-        })
-        callback(1)
-      } else if (mutation.type === 'childList') {
+      if (mutation.type === 'childList') {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeName === 'PIECE') {
-            console.count('mutation childList')
             callback()
           }
         })
         mutation.removedNodes.forEach((node) => {
           if (node.nodeName === 'PIECE') {
-            console.count('mutation childList')
             callback()
           }
         })
@@ -51,52 +38,35 @@ export const createObservations = (callback: () => void) => {
   return observer
 }
 export const createAnimationEndObservations = (callback: () => void) => {
-  const targetNode = boardElement
-
-  // Options for the observer (which mutations to observe)
-  const config = { childList: true, subtree: true }
-
-  // Create a new MutationObserver object
-  const observer = new MutationObserver((mutationsList, observer) => {
-    for (const mutation of mutationsList) {
-      if (mutation.type === 'childList') {
-        for (const addedNode of mutation.addedNodes) {
-          if (addedNode.nodeType === Node.ELEMENT_NODE && addedNode.nodeName === 'PIECE') {
-            // A new "piece" element has been added to the "parentBoard" element
-            observeClassChanges(addedNode)
-          }
+  // create a new observer
+  const observer = new MutationObserver((mutationsList) => {
+    const lastMoves = document.querySelectorAll('square.last-move')
+    // loop through each mutation that occurred
+    for (let mutation of mutationsList) {
+      // check if a piece element was added or removed
+      if (mutation.target.nodeName === 'PIECE') {
+        // check if the anim class was added or removed
+        if (mutation.target.classList.contains('anim')) {
+          // console.log('anim class added to piece')
+          // do something when anim class is added
+          // callback()
+        } else {
+          // console.log('checking', mutation.target)
+          lastMoves.forEach((lastMove) => {
+            // if (areElementsOverlapping(mutation.target, lastMove)) {
+            console.log('anim class removed from piece', mutation.target)
+            // do something when anim class is removed
+            callback()
+            // }
+          })
         }
-      } else if (
-        mutation.type === 'attributes' &&
-        mutation.attributeName === 'class' &&
-        !mutation.target.classList.contains('anim') &&
-        mutation.target.classList.contains('piece')
-      ) {
-        // The class "anim" has been removed from a "piece" tag element
-        console.log('Class "anim" has been removed from a "piece" tag element')
       }
     }
   })
 
-  // Start observing the target node for configured mutations
-  observer.observe(targetNode, config)
-
-  // Function to observe class changes of "piece" elements
-  function observeClassChanges(pieceElement) {
-    const pieceObserver = new MutationObserver((mutationsList, observer) => {
-      for (const mutation of mutationsList) {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'class' &&
-          !mutation.target.classList.contains('anim')
-        ) {
-          // The class "anim" has been removed from the "piece" element
-          console.log('Class "anim" has been removed from a "piece" element')
-        }
-      }
-    })
-    pieceObserver.observe(pieceElement, { attributes: true })
-  }
+  // start observing the chessboard element
+  observer.observe(boardElement, { attributes: true, childList: true, subtree: true })
+  return observer
 }
 
 function App() {
@@ -118,13 +88,11 @@ function App() {
   }, [])
 
   useEffect(() => {
-    console.log('pieces changed, updating hidden pieces')
     const handleUpdateHiddenPieces = () => {
       const res = hidePieces(pieces)
       console.log({ newHiddenPieces: res })
       setHiddenPieces(res)
     }
-    // handleUpdateHiddenPieces()
     // update chrome storage
     chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
     const obs1 = createObservations(() => {
@@ -135,7 +103,7 @@ function App() {
       console.count('animation end')
       handleUpdateHiddenPieces()
     })
-    console.log('creating observations', { obs1, obs2 })
+    handleUpdateHiddenPieces()
     return () => {
       // cleanup the observer
       obs1?.disconnect()
