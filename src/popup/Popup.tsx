@@ -7,101 +7,76 @@ import { hidePieces } from './lib/hidePieces'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES'
 const ACTIVE_TAB_INDEX = 'ACTIVE_TAB_INDEX'
 export const boardElement = document.querySelector('cg-board')
-const createObservations = () => {
-  // const observerCallback = function (mutationsList, observer) {
-  //   for (const mutation of mutationsList) {
-  //     if (
-  //       mutation.type === 'attributes' &&
-  //       mutation.attributeName === 'style' &&
-  //       !mutation.target.className.includes('dragging') &&
-  //       !mutation.target.className.includes('anim') &&
-  //       // !mutation.target.className.includes('last-move') &&
-  //       !mutation.target.className.includes('move-dest')
-  //     ) {
-  //       callback()
-  //     } else if (mutation.type === 'childList') {
-  //       mutation.addedNodes.forEach((node) => {
-  //         if (node.nodeName === 'PIECE') {
-  //           callback()
-  //         }
-  //       })
-  //       mutation.removedNodes.forEach((node) => {
-  //         if (node.nodeName === 'PIECE') {
-  //           callback()
-  //         }
-  //       })
-  //     }
-  //   }
-  // }
-  // // Create a new observer
-  // const observer = new MutationObserver(observerCallback)
-  // const observerOptions = {
-  //   childList: true,
-  //   attributes: true,
-  //   subtree: true,
-  // }
-  // if (!boardElement) return
-  // // Start observing the target node for configured mutations
-  // observer.observe(boardElement, observerOptions)
-  // return observer
+const createObservations = (callback: () => void) => {
+  const observerCallback = function (mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (
+        mutation.type === 'attributes' &&
+        mutation.attributeName === 'style' &&
+        !mutation.target.className.includes('dragging') &&
+        !mutation.target.className.includes('anim') &&
+        // !mutation.target.className.includes('last-move') &&
+        !mutation.target.className.includes('move-dest')
+      ) {
+        callback()
+      } else if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeName === 'PIECE') {
+            callback()
+          }
+        })
+        mutation.removedNodes.forEach((node) => {
+          if (node.nodeName === 'PIECE') {
+            callback()
+          }
+        })
+      }
+    }
+  }
+  // Create a new observer
+  const observer = new MutationObserver(observerCallback)
+  const observerOptions = {
+    childList: true,
+    attributes: true,
+    subtree: true,
+  }
+  if (!boardElement) return
+  // Start observing the target node for configured mutations
+  observer.observe(boardElement, observerOptions)
+  return observer
 }
+const createAnimationEndObservations = (callback: () => void) => {
+  // get the chessboard element
+  const board = boardElement
 
-function areElementsOverlapping(element1: HTMLElement, element2: HTMLElement) {
-  const rect1 = element1.getBoundingClientRect()
-  const rect2 = element2.getBoundingClientRect()
+  // create a new observer
+  const observer = new MutationObserver((mutationsList) => {
+    // loop through each mutation that occurred
+    for (let mutation of mutationsList) {
+      // check if a piece element was added or removed
+      if (mutation.target.nodeName === 'PIECE') {
+        // check if the anim class was added or removed
+        if (mutation.target.classList.contains('anim')) {
+          console.log('anim class added to piece')
+          // do something when anim class is added
+        } else {
+          console.log('anim class removed from piece')
+          // do something when anim class is removed
+          hidePieces
+        }
+      }
+    }
+  })
 
-  const overlapX = Math.max(
-    0,
-    Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left),
-  )
-  const overlapY = Math.max(
-    0,
-    Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top),
-  )
-
-  const area1 = (rect1.right - rect1.left) * (rect1.bottom - rect1.top)
-  const area2 = (rect2.right - rect2.left) * (rect2.bottom - rect2.top)
-
-  const overlapArea = overlapX * overlapY
-  const totalArea = area1 + area2 - overlapArea
-
-  return overlapArea / totalArea >= 0.95
+  // start observing the chessboard element
+  observer.observe(board, { attributes: true, childList: true, subtree: true })
 }
 
 function App() {
   const [pieces, setPieces] = useState<string[]>()
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
   const [activeTab, setActiveTab] = useState<number>()
-  const createAnimationEndObservations = useCallback(() => {
-    // create a new observer
-    const observer = new MutationObserver((mutationsList) => {
-      const lastMoves = document.querySelectorAll('square.last-move')
-      // loop through each mutation that occurred
-      for (let mutation of mutationsList) {
-        // check if a piece element was added or removed
-        if (mutation.target.nodeName === 'PIECE') {
-          // check if the anim class was added or removed
-          if (mutation.target.classList.contains('anim')) {
-            console.log('anim class added to piece')
-            // do something when anim class is added
-          } else {
-            // check to see if the piece is in the last move
-            for (let lastMove of lastMoves) {
-              // check if the piece is in the last move
-              if (areElementsOverlapping(lastMove, mutation.target as HTMLElement)) {
-                // do something when piece is in last move
-                // setHiddenPieces(hidePieces(pieces))
-                console.log({ pieces, hiddenPieces, activeTab })
-              }
-            }
-          }
-        }
-      }
-    })
-
-    // start observing the chessboard element
-    observer.observe(boardElement, { attributes: true, childList: true, subtree: true })
-  }, [pieces, hiddenPieces, activeTab])
+  const handleUpdateHiddenPieces = () => {}
   useMemo(() => {
     const res = hidePieces(pieces)
     console.log({ newHiddenPieces: res })
@@ -109,7 +84,10 @@ function App() {
   }, [pieces])
 
   useEffect(() => {
-    const observers = [createObservations(), createAnimationEndObservations()]
+    const observers = [
+      createObservations(handleUpdateHiddenPieces),
+      createAnimationEndObservations(handleUpdateHiddenPieces),
+    ]
 
     // load in pieces from chrome storage
     chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, ACTIVE_TAB_INDEX], (result) => {
@@ -126,6 +104,7 @@ function App() {
     }
   }, [])
   useEffect(() => {
+    handleUpdateHiddenPieces()
     // update chrome storage
     chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
   }, [pieces])
@@ -147,15 +126,13 @@ function App() {
         >
           Hide Pieces
         </button>
-        {pieces && hiddenPieces && (
-          <Content
-            pieces={pieces}
-            setPieces={setPieces}
-            hiddenPieces={hiddenPieces}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
-        )}
+        <Content
+          pieces={pieces}
+          setPieces={setPieces}
+          hiddenPieces={hiddenPieces}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
       </div>
     </div>
   )
