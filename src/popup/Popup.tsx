@@ -63,7 +63,7 @@ export const createAnimationEndObservations = (callback: () => void) => {
         if (!mutation.target.classList.contains('anim')) {
           lastMoves.forEach((lastMove) => {
             if (areElementsOverlapping(mutation.target, lastMove)) {
-              console.log('anim class removed from piece', mutation.target)
+              // console.log('anim class removed from piece', mutation.target)
               callback()
             }
           })
@@ -97,9 +97,7 @@ function App() {
 
   useEffect(() => {
     const handleUpdateHiddenPieces = () => {
-      const res = hidePieces(pieces)
-      console.log({ newHiddenPieces: res })
-      setHiddenPieces(res)
+      setHiddenPieces(hidePieces(pieces))
     }
     // update chrome storage
     chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
@@ -107,7 +105,7 @@ function App() {
       handleUpdateHiddenPieces()
     })
     const obs2 = createAnimationEndObservations(() => {
-      console.count('animation end')
+      // console.count('animation end')
       handleUpdateHiddenPieces()
     })
     handleUpdateHiddenPieces()
@@ -129,9 +127,7 @@ function App() {
       <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
         <button
           onClick={() => {
-            const res = hidePieces(pieces)
-            console.log({ newHiddenPieces: res })
-            setHiddenPieces(res)
+            setHiddenPieces(hidePieces(pieces))
           }}
         >
           Hide Pieces
@@ -158,7 +154,7 @@ const Content = ({
   pieces?: string[] | undefined
   setPieces: (pieces: string[]) => void
   hiddenPieces?: SerializedChessPiece[]
-  activeTab: number
+  activeTab?: number
   setActiveTab: (index: number) => void
 }) => {
   const content = [

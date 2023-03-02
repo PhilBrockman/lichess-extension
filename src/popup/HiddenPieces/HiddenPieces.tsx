@@ -5,10 +5,11 @@ export function HiddenPieces({ pieces }: { pieces: SerializedChessPiece[] }) {
   return (
     <div className="flex flex-col flex-wrap">
       {pieces.map(
-        (piece) =>
+        (piece, i) =>
           piece &&
           piece.row &&
-          piece.column && <HiddenPiece key={`${piece.row}${piece.column}`} {...piece} />,
+          piece.column &&
+          piece.color !== 'ghost' && <HiddenPiece key={i} {...piece} />,
       )}
     </div>
   )

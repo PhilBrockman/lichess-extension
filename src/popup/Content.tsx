@@ -2,43 +2,21 @@ import { useCallback, useEffect, useState } from 'react'
 import PiecesCheckBoxes from './Pieces/PiecesCheckBoxes'
 import { SerializedChessPiece } from './types'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
-import { hidePieces } from './lib/hidePieces'
 import _ from 'lodash'
-import { createObservations, createAnimationEndObservations } from './Popup'
 
 export function Content({
   pieces,
   setPieces,
+  hiddenPieces,
   activeTab,
   setActiveTab,
 }: {
   pieces: string[]
   setPieces: (pieces: string[]) => void
-
-  activeTab: number
+  hiddenPieces: SerializedChessPiece[]
+  activeTab?: number
   setActiveTab: (index: number) => void
 }) {
-  const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
-
-  console.log('rendering content')
-  useEffect(() => {
-    console.log('creating observations')
-    // const updateHiddenPieces = () => {
-    //   const res = hidePieces(pieces)
-    //   console.log({ pieces, newHiddenPieces: res })
-    //   setHiddenPieces(res)
-    // }
-
-    // const creationCallback = (val?: any) => {
-    //   console.log({
-    //     val,
-    //     pieces,
-    //     activeTab,
-    //   })
-    //   updateHiddenPieces()
-    // }
-  }, [pieces])
-
   const content = [
     {
       label: 'Settings',
