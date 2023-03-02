@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import PieceCheckBox from './PieceCheckBox'
+import * as Tabs from '@radix-ui/react-tabs'
 
 const pieceTypes = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king']
 
@@ -42,19 +43,27 @@ const Preset = ({
   isActive: boolean
 }) => {
   return (
-    <div key={preset.label} className="flex flex-col gap-1 group">
-      <button
-        className={
-          !isActive
-            ? 'px-2 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
-            : 'px-2 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200'
-        }
-        onClick={() => setCheckedPieces(preset.data)}
-      >
-        {isActive && <span className="mr-1">✓</span>}
-        {preset.label}
-      </button>
-      <span className="text-xs text-gray-400 group-hover:text-gray-600">{preset.helper}</span>
+    <div key={preset.label} className={`flex-grow`}>
+      <div className="flex flex-col gap-1 group flex-grow-0">
+        <button
+          id={preset.label}
+          className={
+            !isActive
+              ? 'px-2 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
+              : 'px-2 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200'
+          }
+          onClick={() => setCheckedPieces(preset.data)}
+        >
+          {isActive && <span className="mr-1">✓</span>}
+          {preset.label}
+        </button>
+        <label
+          htmlFor={preset.label}
+          className="text-xs text-gray-400 group-hover:text-gray-600 cursor-pointer"
+        >
+          {preset.helper}
+        </label>
+      </div>
     </div>
   )
 }
@@ -71,16 +80,38 @@ export default function PiecesCheckBoxes({
   useEffect(() => {
     onChange(checkedPieces)
   }, [checkedPieces])
-
   const preconfigured = [ALL_HIDDEN, PAWNS_ONLY, KINGS_ROOKS_AND_QUEENS]
+  const [activeTab, setActiveTab] = useState('tab1')
 
   return (
-    <div className="p-3 space-y-10 text-left">
-      <div className="space-y-3 border border-gray-200 rounded-md p-3">
-        <div>Basic</div>
+    <Tabs.Root
+      className="flex flex-col w-[300px] shadow-[0_2px_10px] shadow-blackA4"
+      defaultValue="tab1"
+      value={activeTab}
+      onValueChange={(t) => setActiveTab(t)}
+    >
+      <Tabs.List className="shrink-0 flex border-b border-mauve6" aria-label="Manage your account">
+        <Tabs.Trigger
+          className={`${
+            activeTab === 'tab1' && 'border-b-2 border-purple-700 '
+          } text-purple-700 grow px-5 rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black`}
+          value="tab1"
+        >
+          Basic
+        </Tabs.Trigger>
+        <Tabs.Trigger
+          className={`${
+            activeTab === 'tab2' && 'border-b-2 border-purple-700 '
+          } text-purple-700 grow px-5 rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black`}
+          value="tab2"
+        >
+          Advanced
+        </Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content className="grow p-5 bg-white rounded-b-md outline-none " value="tab1">
         <div className="ml-3 space-y-3">
           <p>Use the presets to quickly set which pieces are hidden in your games</p>
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-row gap-2 w-full">
             {preconfigured.map((preset) => (
               <Preset
                 key={preset.label}
@@ -91,9 +122,20 @@ export default function PiecesCheckBoxes({
             ))}
           </div>
         </div>
-      </div>
-      <div className="space-y-3 border border-gray-200 rounded-md p-3">
-        <div>Advanced</div>
+        <Preset
+          preset={{
+            label: 'All visible',
+            helper: 'Do not hide any pieces (or pawns)',
+            data: [],
+          }}
+          setCheckedPieces={setCheckedPieces}
+          isActive={arraysAreEqual(checkedPieces, [])}
+        />
+      </Tabs.Content>
+      <Tabs.Content
+        className="grow p-5 bg-white rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"
+        value="tab2"
+      >
         <div className="ml-3 space-y-3">
           <p>Use the checkboxes to set which pieces are hidden in your games</p>{' '}
           <div className="pieces-checkboxes">
@@ -113,16 +155,7 @@ export default function PiecesCheckBoxes({
             ))}
           </div>
         </div>
-      </div>
-      <Preset
-        preset={{
-          label: 'All visible',
-          helper: 'Do not hide any pieces (or pawns)',
-          data: [],
-        }}
-        setCheckedPieces={setCheckedPieces}
-        isActive={arraysAreEqual(checkedPieces, [])}
-      />
-    </div>
+      </Tabs.Content>
+    </Tabs.Root>
   )
 }
