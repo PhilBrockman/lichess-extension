@@ -46,30 +46,52 @@ const createObservations = (callback: () => void) => {
   return observer
 }
 const createAnimationEndObservations = (callback: () => void) => {
-  // get the chessboard element
-  const board = boardElement
+  const targetNode = boardElement
 
-  // create a new observer
-  const observer = new MutationObserver((mutationsList) => {
-    // loop through each mutation that occurred
-    for (let mutation of mutationsList) {
-      // check if a piece element was added or removed
-      if (mutation.target.nodeName === 'PIECE') {
-        // check if the anim class was added or removed
-        if (mutation.target.classList.contains('anim')) {
-          console.log('anim class added to piece')
-          // do something when anim class is added
-        } else {
-          console.log('anim class removed from piece')
-          // do something when anim class is removed
-          hidePieces
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true, subtree: true }
+
+  // Create a new MutationObserver object
+  const observer = new MutationObserver((mutationsList, observer) => {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList') {
+        for (const addedNode of mutation.addedNodes) {
+          if (addedNode.nodeType === Node.ELEMENT_NODE && addedNode.nodeName === 'PIECE') {
+            // A new "piece" element has been added to the "parentBoard" element
+            observeClassChanges(addedNode)
+          }
         }
+      } else if (
+        mutation.type === 'attributes' &&
+        mutation.attributeName === 'class' &&
+        !mutation.target.classList.contains('anim') &&
+        mutation.target.classList.contains('piece')
+      ) {
+        // The class "anim" has been removed from a "piece" tag element
+        console.log('Class "anim" has been removed from a "piece" tag element')
       }
     }
   })
 
-  // start observing the chessboard element
-  observer.observe(board, { attributes: true, childList: true, subtree: true })
+  // Start observing the target node for configured mutations
+  observer.observe(targetNode, config)
+
+  // Function to observe class changes of "piece" elements
+  function observeClassChanges(pieceElement) {
+    const pieceObserver = new MutationObserver((mutationsList, observer) => {
+      for (const mutation of mutationsList) {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'class' &&
+          !mutation.target.classList.contains('anim')
+        ) {
+          // The class "anim" has been removed from the "piece" element
+          console.log('Class "anim" has been removed from a "piece" element')
+        }
+      }
+    })
+    pieceObserver.observe(pieceElement, { attributes: true })
+  }
 }
 
 function App() {
