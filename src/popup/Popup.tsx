@@ -7,7 +7,7 @@ import { hidePieces } from './lib/hidePieces'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES'
 const ACTIVE_TAB_INDEX = 'ACTIVE_TAB_INDEX'
 export const boardElement = document.querySelector('cg-board')
-const createObservations = (callback: () => void) => {
+export const createObservations = (callback: () => void) => {
   const observerCallback = function (mutationsList, observer) {
     for (const mutation of mutationsList) {
       if (
@@ -18,15 +18,20 @@ const createObservations = (callback: () => void) => {
         // !mutation.target.className.includes('last-move') &&
         !mutation.target.className.includes('move-dest')
       ) {
-        callback()
+        console.log({
+          callback,
+        })
+        callback(1)
       } else if (mutation.type === 'childList') {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeName === 'PIECE') {
+            console.count('mutation childList')
             callback()
           }
         })
         mutation.removedNodes.forEach((node) => {
           if (node.nodeName === 'PIECE') {
+            console.count('mutation childList')
             callback()
           }
         })
@@ -45,7 +50,7 @@ const createObservations = (callback: () => void) => {
   observer.observe(boardElement, observerOptions)
   return observer
 }
-const createAnimationEndObservations = (callback: () => void) => {
+export const createAnimationEndObservations = (callback: () => void) => {
   const targetNode = boardElement
 
   // Options for the observer (which mutations to observe)
@@ -98,19 +103,9 @@ function App() {
   const [pieces, setPieces] = useState<string[]>()
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
   const [activeTab, setActiveTab] = useState<number>()
-  const handleUpdateHiddenPieces = () => {}
-  useMemo(() => {
-    const res = hidePieces(pieces)
-    console.log({ newHiddenPieces: res })
-    setHiddenPieces(res)
-  }, [pieces])
 
   useEffect(() => {
-    const observers = [
-      createObservations(handleUpdateHiddenPieces),
-      createAnimationEndObservations(handleUpdateHiddenPieces),
-    ]
-
+    console.log('loading state')
     // load in pieces from chrome storage
     chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, ACTIVE_TAB_INDEX], (result) => {
       if (result[PREFERRED_HIDDEN_PIECES]) {
@@ -120,18 +115,36 @@ function App() {
         setActiveTab(result[ACTIVE_TAB_INDEX])
       }
     })
-    return () => {
-      // cleanup the observer
-      observers.forEach((observer) => observer?.disconnect())
-    }
   }, [])
+
   useEffect(() => {
-    handleUpdateHiddenPieces()
+    console.log('pieces changed, updating hidden pieces')
+    const handleUpdateHiddenPieces = () => {
+      const res = hidePieces(pieces)
+      console.log({ newHiddenPieces: res })
+      setHiddenPieces(res)
+    }
+    // handleUpdateHiddenPieces()
     // update chrome storage
     chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
+    const obs1 = createObservations(() => {
+      console.count('create obs')
+      handleUpdateHiddenPieces()
+    })
+    const obs2 = createAnimationEndObservations(() => {
+      console.count('animation end')
+      handleUpdateHiddenPieces()
+    })
+    console.log('creating observations', { obs1, obs2 })
+    return () => {
+      // cleanup the observer
+      obs1?.disconnect()
+      obs2?.disconnect()
+    }
   }, [pieces])
 
   useEffect(() => {
+    console.log('active tab changed, updating hidden pieces')
     // update chrome storage
     chrome.storage.sync.set({ [ACTIVE_TAB_INDEX]: activeTab })
   }, [activeTab])
