@@ -1,3 +1,5 @@
+import { SerializedChessPiece } from '../types'
+
 function getChessPiecePosition(width, height, transformX, transformY) {
   const boardParent = document.querySelector('cg-container').parentElement
   // Calculate the size of each square on the chessboard
@@ -75,7 +77,7 @@ function getTransformDirections(transform) {
   return [parseInt(x), parseInt(y)]
 }
 
-function getChessPieceLocation(piece) {
+function getChessPieceLocation(piece): SerializedChessPiece {
   // Get the width and height of the chessboard
   const { width, height } = getChessBoardDimensions()
 
@@ -95,19 +97,17 @@ function getChessPieceLocation(piece) {
     column: String.fromCharCode(96 + file),
     color,
     pieceName,
+    originalPosition: piece,
   }
 }
 
 export const hidePieces = (PIECES_THAT_I_CAN_HIDE: any) => {
   const pieces = document.querySelectorAll('piece')
-  console.log('pieces', pieces)
-  console.log('PIECES_THAT_I_CAN_HIDE', PIECES_THAT_I_CAN_HIDE)
   const hiddenPieces = []
   pieces.forEach((piece) => {
     // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
     if (PIECES_THAT_I_CAN_HIDE?.some((pieceName) => piece.className.includes(pieceName))) {
       piece.style.opacity = '.20'
-      console.log('hiding')
       hiddenPieces.push(getChessPieceLocation(piece))
     } else {
       piece.style.opacity = '1'

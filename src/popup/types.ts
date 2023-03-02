@@ -3,4 +3,5 @@ export type SerializedChessPiece = {
   column: string
   color: string
   pieceName: string
+  originalPosition: any
 }

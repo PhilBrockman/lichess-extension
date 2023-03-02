@@ -1,17 +1,9 @@
+import { SerializedChessPiece } from '../types'
 import { HiddenPiece } from './HiddenPiece'
 
-export function HiddenPieces({
-  pieces,
-}: {
-  pieces: {
-    row: number
-    column: string
-    color: string
-    pieceName: string
-  }[]
-}) {
+export function HiddenPieces({ pieces }: { pieces: SerializedChessPiece[] }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col flex-wrap">
       {pieces.map(
         (piece) =>
           piece &&

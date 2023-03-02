@@ -15,7 +15,7 @@ const createObservations = (callback: () => void) => {
         mutation.attributeName === 'style' &&
         !mutation.target.className.includes('dragging') &&
         !mutation.target.className.includes('anim') &&
-        !mutation.target.className.includes('last-move') &&
+        // !mutation.target.className.includes('last-move') &&
         !mutation.target.className.includes('move-dest')
       ) {
         callback()
@@ -45,21 +45,74 @@ const createObservations = (callback: () => void) => {
   observer.observe(boardElement, observerOptions)
   return observer
 }
+const createAnimationEndObservations = (callback: () => void) => {
+  const targetNode = boardElement
+
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true, subtree: true }
+
+  // Create a new MutationObserver object
+  const observer = new MutationObserver((mutationsList, observer) => {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList') {
+        for (const addedNode of mutation.addedNodes) {
+          if (addedNode.nodeType === Node.ELEMENT_NODE && addedNode.nodeName === 'PIECE') {
+            // A new "piece" element has been added to the "parentBoard" element
+            observeClassChanges(addedNode)
+          }
+        }
+      } else if (
+        mutation.type === 'attributes' &&
+        mutation.attributeName === 'class' &&
+        !mutation.target.classList.contains('anim') &&
+        mutation.target.classList.contains('piece')
+      ) {
+        // The class "anim" has been removed from a "piece" tag element
+        console.log('Class "anim" has been removed from a "piece" tag element')
+      }
+    }
+  })
+
+  // Start observing the target node for configured mutations
+  observer.observe(targetNode, config)
+
+  // Function to observe class changes of "piece" elements
+  function observeClassChanges(pieceElement) {
+    const pieceObserver = new MutationObserver((mutationsList, observer) => {
+      for (const mutation of mutationsList) {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'class' &&
+          !mutation.target.classList.contains('anim')
+        ) {
+          // The class "anim" has been removed from the "piece" element
+          console.log('Class "anim" has been removed from a "piece" element')
+        }
+      }
+    })
+    pieceObserver.observe(pieceElement, { attributes: true })
+  }
+}
 
 function App() {
   const [pieces, setPieces] = useState<string[]>()
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
-  const [activeTab, setActiveTab] = useState<number>(0)
+  const [activeTab, setActiveTab] = useState<number>()
   const handleUpdateHiddenPieces = () => {}
   useMemo(() => {
-    setHiddenPieces(hidePieces(pieces))
+    const res = hidePieces(pieces)
+    console.log({ newHiddenPieces: res })
+    setHiddenPieces(res)
   }, [pieces])
 
   useEffect(() => {
-    const observer = createObservations(handleUpdateHiddenPieces)
+    const observers = [
+      createObservations(handleUpdateHiddenPieces),
+      createAnimationEndObservations(handleUpdateHiddenPieces),
+    ]
+
     // load in pieces from chrome storage
     chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, ACTIVE_TAB_INDEX], (result) => {
-      console.log('result', result)
       if (result[PREFERRED_HIDDEN_PIECES]) {
         setPieces(result[PREFERRED_HIDDEN_PIECES])
       }
@@ -69,7 +122,7 @@ function App() {
     })
     return () => {
       // cleanup the observer
-      observer?.disconnect()
+      observers.forEach((observer) => observer?.disconnect())
     }
   }, [])
   useEffect(() => {
@@ -86,6 +139,15 @@ function App() {
   return (
     <div className="absolute left-0 top-16" style={{ zIndex: 1000 }}>
       <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+        <button
+          onClick={() => {
+            const res = hidePieces(pieces)
+            console.log({ newHiddenPieces: res })
+            setHiddenPieces(res)
+          }}
+        >
+          Hide Pieces
+        </button>
         <Content
           pieces={pieces}
           setPieces={setPieces}
