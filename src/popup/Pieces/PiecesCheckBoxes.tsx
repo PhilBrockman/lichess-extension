@@ -5,18 +5,18 @@ import * as Tabs from '@radix-ui/react-tabs'
 const pieceTypes = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king']
 
 const ALL_HIDDEN = {
-  label: 'Board only',
+  label: 'Pieceless Puzzles',
   helper: 'Hide all game pieces',
   data: ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'],
 }
 const PAWNS_ONLY = {
-  label: 'Pawns rule',
-  helper: 'Only pawns will be visible',
+  label: 'Pawn Party',
+  helper: 'Hide all pieces except pawns',
   data: ['rook', 'knight', 'bishop', 'queen', 'king'],
 }
 const KINGS_ROOKS_AND_QUEENS = {
-  label: 'Revolution',
-  helper: 'Hide all pieces except kings and queens',
+  label: 'Vive la révolution!',
+  helper: 'The king and queen are nowhere to be found',
   data: ['queen', 'king'],
 }
 
@@ -27,6 +27,15 @@ function arraysAreEqual(arr1: string[], arr2: string[]) {
 
   // Compare the sorted arrays using JSON.stringify()
   return JSON.stringify(sortedArr1) === JSON.stringify(sortedArr2)
+}
+
+export const PieceMap = {
+  king: '♔',
+  queen: '♕',
+  rook: '♖',
+  bishop: '♗',
+  knight: '♘',
+  pawn: '♙',
 }
 
 const Preset = ({
@@ -42,27 +51,46 @@ const Preset = ({
   setCheckedPieces: (pieces: string[]) => void
   isActive: boolean
 }) => {
+  const commonClasses =
+    'relative flex flex-col flex-grow-0 items-center justify-center gap-1 p-3 rounded-md border '
+  const activeClasses =
+    'bg-blue-100 text-gray-800 hover:text-gray-900 cursor-default border-blue-500'
+  const inactiveClasses =
+    'cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border-gray-300'
   return (
-    <div key={preset.label} className={`flex-grow`}>
-      <div className="flex flex-col gap-1 group flex-grow-0">
-        <button
-          id={preset.label}
-          className={
-            !isActive
-              ? 'px-2 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700'
-              : 'px-2 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200'
-          }
-          onClick={() => setCheckedPieces(preset.data)}
-        >
-          {isActive && <span className="mr-1">✓</span>}
-          {preset.label}
-        </button>
-        <label
-          htmlFor={preset.label}
-          className="text-xs text-gray-400 group-hover:text-gray-600 cursor-pointer"
-        >
-          {preset.helper}
-        </label>
+    <div key={preset.label} className="relative">
+      <div
+        className={commonClasses + (isActive ? activeClasses : inactiveClasses)}
+        onClick={() => setCheckedPieces(preset.data)}
+        role="button"
+      >
+        {isActive && (
+          <div className="absolute top-0 right-0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+              />
+            </svg>
+          </div>
+        )}
+        <div className="text-center text-xl">{preset.label}</div>
+        <div className="flex flex-row gap-1">
+          {preset.data.map((piece) => (
+            <span key={piece} className="text-4xl text-gray-400 group-hover:text-gray-600">
+              {PieceMap[piece as keyof typeof PieceMap]}
+            </span>
+          ))}
+        </div>
+        <p className="text-md text-gray-500 group-hover:text-gray-700">{preset.helper}</p>
       </div>
     </div>
   )
@@ -80,8 +108,17 @@ export default function PiecesCheckBoxes({
   useEffect(() => {
     onChange(checkedPieces)
   }, [checkedPieces])
-  const preconfigured = [ALL_HIDDEN, PAWNS_ONLY, KINGS_ROOKS_AND_QUEENS]
-  const [activeTab, setActiveTab] = useState('tab1')
+  const preconfigured = [
+    ALL_HIDDEN,
+    PAWNS_ONLY,
+    KINGS_ROOKS_AND_QUEENS,
+    {
+      label: 'Show all pieces',
+      helper: 'Always show all pieces',
+      data: [],
+    },
+  ]
+  const [activeTab, setActiveTab] = useState('tab2')
 
   return (
     <Tabs.Root
@@ -97,7 +134,7 @@ export default function PiecesCheckBoxes({
           } text-purple-700 grow px-5 rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black`}
           value="tab1"
         >
-          Basic
+          Preset
         </Tabs.Trigger>
         <Tabs.Trigger
           className={`${
@@ -105,13 +142,13 @@ export default function PiecesCheckBoxes({
           } text-purple-700 grow px-5 rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black`}
           value="tab2"
         >
-          Advanced
+          Custom
         </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content className="grow p-5 bg-white rounded-b-md outline-none " value="tab1">
-        <div className="ml-3 space-y-3">
-          <p>Use the presets to quickly set which pieces are hidden in your games</p>
-          <div className="flex flex-row gap-2 w-full">
+        <div className="ml-3 space-y-3 text-gray-500">
+          <p>Use the presets to choose which pieces are hidden in your games</p>
+          <div className="flex flex-col gap-2 w-full">
             {preconfigured.map((preset) => (
               <Preset
                 key={preset.label}
@@ -122,15 +159,6 @@ export default function PiecesCheckBoxes({
             ))}
           </div>
         </div>
-        <Preset
-          preset={{
-            label: 'All visible',
-            helper: 'Do not hide any pieces (or pawns)',
-            data: [],
-          }}
-          setCheckedPieces={setCheckedPieces}
-          isActive={arraysAreEqual(checkedPieces, [])}
-        />
       </Tabs.Content>
       <Tabs.Content
         className="grow p-5 bg-white rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"

@@ -23,7 +23,12 @@ export function HiddenPiece(piece: SerializedChessPiece) {
   const handleClick = () => {
     // make the piece visible
     console.log('original position', piece.originalPosition)
-    piece.originalPosition.style.opacity = '1'
+    // if the piece is already visible, make it invisible
+    if (piece.originalPosition.style.opacity === '1') {
+      piece.originalPosition.style.opacity = '0'
+    } else {
+      piece.originalPosition.style.opacity = '1'
+    }
   }
 
   const handleMouseLeave = () => {

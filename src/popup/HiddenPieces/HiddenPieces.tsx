@@ -3,7 +3,7 @@ import { HiddenPiece } from './HiddenPiece'
 
 export function HiddenPieces({ pieces }: { pieces: SerializedChessPiece[] }) {
   return (
-    <div className="flex flex-col flex-wrap">
+    <div className="flex flex-row flex-wrap">
       {pieces.map(
         (piece, i) =>
           piece &&

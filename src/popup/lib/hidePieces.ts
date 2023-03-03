@@ -117,3 +117,10 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: string[]) => {
   })
   return hiddenPieces
 }
+
+export const showAllPieces = () => {
+  const pieces = document.querySelectorAll('piece')
+  pieces.forEach((piece) => {
+    piece.style.opacity = '1'
+  })
+}

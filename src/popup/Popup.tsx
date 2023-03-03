@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import PiecesCheckBoxes from './Pieces/PiecesCheckBoxes'
+import { useEffect, useState } from 'react'
 import { SerializedChessPiece } from './types'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
-import { hidePieces } from './lib/hidePieces'
+import { hidePieces, showAllPieces } from './lib/hidePieces'
 import _ from 'lodash'
 import Settings from './Modal/Settings'
 
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES'
-const ACTIVE_TAB_INDEX = 'ACTIVE_TAB_INDEX'
+const IS_ACTIVE = 'IS_ACTIVE'
 
 function areElementsOverlapping(element1: HTMLElement, element2: HTMLElement) {
   const rect1 = element1.getBoundingClientRect()
@@ -67,28 +66,27 @@ const basicObserver = ({ callback }: { callback: (target: any) => void }) => {
 }
 
 function App() {
+  const [isActive, setIsActive] = useState<boolean>(false)
   const [pieces, setPieces] = useState<string[]>()
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
-  const [activeTab, setActiveTab] = useState<number>()
 
   useEffect(() => {
     // load in pieces from chrome storage
-    chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, ACTIVE_TAB_INDEX], (result) => {
+    chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, IS_ACTIVE], (result) => {
       if (result[PREFERRED_HIDDEN_PIECES]) {
         setPieces(result[PREFERRED_HIDDEN_PIECES])
       }
-      if (result[ACTIVE_TAB_INDEX]) {
-        setActiveTab(result[ACTIVE_TAB_INDEX])
+      if (result[IS_ACTIVE]) {
+        setIsActive(result[IS_ACTIVE])
       }
     })
   }, [])
 
   useEffect(() => {
-    console.log('creating observers')
+    if (!isActive) return
     const obs3 = basicObserver({
       callback: _.debounce(
         () => {
-          console.count('--->')
           setHiddenPieces(hidePieces(pieces))
         },
         300,
@@ -96,38 +94,40 @@ function App() {
       ),
     })
     return () => {
-      console.error('disconnecting observers')
       obs3?.disconnect()
     }
-  }, [pieces])
+  }, [pieces, isActive])
 
   useEffect(() => {
     // update chrome storage
-    console.log('updtangi storage')
     chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
+    if (!isActive) return
     setHiddenPieces(hidePieces(pieces))
   }, [pieces])
 
+  const disableExtension = () => {
+    setIsActive(false)
+    showAllPieces()
+  }
+
   useEffect(() => {
-    chrome.storage.sync.set({ [ACTIVE_TAB_INDEX]: activeTab })
-  }, [activeTab])
+    chrome.storage.sync.set({ [IS_ACTIVE]: isActive })
+    if (!isActive) {
+      showAllPieces()
+    } else {
+      setHiddenPieces(hidePieces(pieces))
+    }
+  }, [isActive])
 
   return (
-    <div className="absolute left-0 top-16" style={{ zIndex: 1000 }}>
+    <div className="" style={{ zIndex: 1000 }}>
       <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
-        <button
-          onClick={() => {
-            setHiddenPieces(hidePieces(pieces))
-          }}
-        >
-          Hide Pieces
-        </button>
         <Content
+          isActive={isActive}
           pieces={pieces}
           setPieces={setPieces}
           hiddenPieces={hiddenPieces}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setIsActive={setIsActive}
         />
       </div>
     </div>
@@ -135,23 +135,55 @@ function App() {
 }
 
 const Content = ({
+  isActive,
   pieces,
   setPieces,
   hiddenPieces,
-  activeTab,
-  setActiveTab,
+  setIsActive,
 }: {
+  isActive: boolean
   pieces?: string[] | undefined
   setPieces: (pieces: string[]) => void
   hiddenPieces?: SerializedChessPiece[]
-  activeTab?: number
-  setActiveTab: (index: number) => void
+  setIsActive: (isActive: boolean) => void
 }) => {
   return (
     <>
-      <Settings pieces={pieces} setPieces={setPieces} />
-      <div className="max-h-96 overflow-y-auto">
-        <>{hiddenPieces && <HiddenPieces pieces={hiddenPieces} />}</>
+      <div>
+        <div className="flex flex-row gap-3">
+          {isActive ? (
+            <>
+              <button
+                onClick={() => setIsActive(false)}
+                className="px-4 py-2 text-sm font-medium text-center text-gray-500 border border-gray-200 rounded-md dark:text-gray-400 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Disable
+              </button>
+              <Settings pieces={pieces} setPieces={setPieces} />
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                // set active to true
+                setIsActive(true)
+                // scroll all the way to the bottom of the container
+                const container = document.querySelector('.puzzle__moves.areplay')
+                console.log(container)
+                if (container) {
+                  setTimeout(() => {
+                    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+                  }, 150)
+                }
+              }}
+              className="w-full px-4 py-2 text-sm font-medium text-center text-gray-500 border border-gray-200 rounded-md dark:text-gray-400 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              Hide Pieces
+            </button>
+          )}
+        </div>
+        <div className="flex flex-row gap-3">
+          <>{isActive && hiddenPieces && <HiddenPieces pieces={hiddenPieces} />}</>
+        </div>
       </div>
     </>
   )

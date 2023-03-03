@@ -14,7 +14,23 @@ document.head.appendChild(linkElement)
 
 // Create a container element in the DOM where you can render your component
 const container = document.createElement('div')
-document.body.appendChild(container)
+const element = document.querySelector('.puzzle__moves.areplay')
+element?.appendChild(container)
+
+// const element = document.querySelector('.puzzle__board.main-board')
+// // append "flex and flex-row" to the classList
+// element?.classList.add('flex', 'flex-row')
+
+// Get the element to be wrapped
+
+// Create a new div element
+// const div = document.createElement('div')
+// div.classList.add('flex', 'flex-row')
+// // Insert the div before the element in the DOM tree
+// element.parentNode.insertBefore(div, element)
+// // Move the element inside the new div
+// div.appendChild(element)
+// div.appendChild(container)
 
 // Render your React component into the container element
 ReactDOM.createRoot(container).render(
