@@ -37,14 +37,14 @@ export function HiddenPiece(piece: SerializedChessPiece) {
 
   return (
     <div
-      className="flex flex-row gap-2 items-center cursor-pointer p-2 rounded-md bg-gray-200 flex-shrink-0"
+      className="flex flex-row gap-2 items-center cursor-pointer px-2 py-1 rounded-lg border border-1 border-gray-300  bg-gray-200 flex-shrink-0"
       onClick={handleClick}
       onMouseLeave={handleMouseLeave}
       role="button"
     >
       <img src={url} className="w-8 h-8" />
       <div>
-        <span>{piece.column}</span>
+        <span>{piece.column.toUpperCase()}</span>
         <span>{piece.row}</span>
       </div>
     </div>

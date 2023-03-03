@@ -15,11 +15,11 @@ export default defineManifest({
   //   default_popup: 'popup.html',
   //   default_icon: 'img/logo-48.png',
   // },
-  options_page: 'options.html',
-  background: {
-    service_worker: 'src/background/index.ts',
-    type: 'module',
-  },
+  // options_page: 'options.html',
+  // background: {
+  //   service_worker: 'src/background/index.ts',
+  //   type: 'module',
+  // },
   content_scripts: [
     {
       matches: ['https://lichess.org/*'],
@@ -36,7 +36,6 @@ export default defineManifest({
     'tabs', // Allows access to the tabs API
     'activeTab', // Allows access to the currently active tab
     'scripting', // Allows content scripts to run
-    'background', // Allows background workers to run
     'storage', // Allows access to the browser's storage API
   ],
 })

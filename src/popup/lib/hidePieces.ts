@@ -102,17 +102,16 @@ function getChessPieceLocation(piece): SerializedChessPiece {
 }
 
 export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: string[]) => {
-  // console.count('hiding pieces')
   const pieces = document.querySelectorAll('piece')
   const hiddenPieces = []
   pieces.forEach((piece) => {
-    if (piece.className.includes('ghost')) return
+    if (piece.className.indexOf('ghost') !== -1) return
     // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
-    if (PIECES_THAT_I_CAN_HIDE?.some((pieceName) => piece.className.includes(pieceName))) {
-      piece.style.opacity = '.20'
+    if (PIECES_THAT_I_CAN_HIDE?.some((pieceName) => piece.className.indexOf(pieceName) !== -1)) {
+      ;(piece as HTMLElement).style.opacity = '0'
       hiddenPieces.push(getChessPieceLocation(piece))
     } else {
-      piece.style.opacity = '1'
+      ;(piece as HTMLElement).style.opacity = '1'
     }
   })
   return hiddenPieces
@@ -121,6 +120,6 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: string[]) => {
 export const showAllPieces = () => {
   const pieces = document.querySelectorAll('piece')
   pieces.forEach((piece) => {
-    piece.style.opacity = '1'
+    ;(piece as HTMLElement).style.opacity = '1'
   })
 }

@@ -70,13 +70,13 @@ const Preset = ({
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="currentColor"
               className="w-6 h-6"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
               />
             </svg>
@@ -93,6 +93,28 @@ const Preset = ({
         <p className="text-md text-gray-500 group-hover:text-gray-700">{preset.helper}</p>
       </div>
     </div>
+  )
+}
+
+const inactiveHoveringClasses = 'hover:border-2 hover:bg-gray-100 hover:border-gray-300'
+const Trigger = ({
+  value,
+  children,
+  activeTab,
+}: {
+  value: string
+  activeTab: string
+  children: React.ReactNode
+}) => {
+  return (
+    <Tabs.Trigger
+      className={`${
+        activeTab === value ? 'border-b-2 border-purple-700 ' : inactiveHoveringClasses
+      } text-purple-700 grow px-5 rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black`}
+      value={value}
+    >
+      {children}
+    </Tabs.Trigger>
   )
 }
 
@@ -118,8 +140,8 @@ export default function PiecesCheckBoxes({
       data: [],
     },
   ]
-  const [activeTab, setActiveTab] = useState('tab2')
-
+  const isUsingPreconfigured = preconfigured.some((p) => arraysAreEqual(p.data, checkedPieces))
+  const [activeTab, setActiveTab] = useState(isUsingPreconfigured ? 'tab1' : 'tab2')
   return (
     <Tabs.Root
       className="flex flex-col w-[300px] shadow-[0_2px_10px] shadow-blackA4"
@@ -128,22 +150,12 @@ export default function PiecesCheckBoxes({
       onValueChange={(t) => setActiveTab(t)}
     >
       <Tabs.List className="shrink-0 flex border-b border-mauve6" aria-label="Manage your account">
-        <Tabs.Trigger
-          className={`${
-            activeTab === 'tab1' && 'border-b-2 border-purple-700 '
-          } text-purple-700 grow px-5 rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black`}
-          value="tab1"
-        >
-          Preset
-        </Tabs.Trigger>
-        <Tabs.Trigger
-          className={`${
-            activeTab === 'tab2' && 'border-b-2 border-purple-700 '
-          } text-purple-700 grow px-5 rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black`}
-          value="tab2"
-        >
+        <Trigger value="tab1" activeTab={activeTab}>
+          Presets
+        </Trigger>
+        <Trigger value="tab2" activeTab={activeTab}>
           Custom
-        </Tabs.Trigger>
+        </Trigger>
       </Tabs.List>
       <Tabs.Content className="grow p-5 bg-white rounded-b-md outline-none " value="tab1">
         <div className="ml-3 space-y-3 text-gray-500">
@@ -165,8 +177,8 @@ export default function PiecesCheckBoxes({
         value="tab2"
       >
         <div className="ml-3 space-y-3">
-          <p>Use the checkboxes to set which pieces are hidden in your games</p>{' '}
-          <div className="pieces-checkboxes">
+          <p>Choose which pieces are kept on the board:</p>
+          <div className="flex flex-col gap-2 w-full">
             {pieceTypes.map((pieceType) => (
               <PieceCheckBox
                 key={pieceType}
