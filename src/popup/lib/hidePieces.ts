@@ -1,7 +1,13 @@
 import { SerializedChessPiece } from '../types'
 
-function getChessPiecePosition(width, height, transformX, transformY) {
-  const boardParent = document.querySelector('cg-container').parentElement
+function getChessPiecePosition(
+  width: number,
+  height: number,
+  transformX: number,
+  transformY: number,
+) {
+  const boardParent = document.querySelector('cg-container')?.parentElement
+  if (!boardParent) throw new Error('Could not find board parent')
   // Calculate the size of each square on the chessboard
   const squareSize = width / 8
   // Apply the transformation to find the final position of the piece
@@ -33,6 +39,7 @@ function getChessPiecePosition(width, height, transformX, transformY) {
 
 function getChessBoardDimensions() {
   const board = document.querySelector('cg-container')
+  if (!board) throw new Error('Could not find chessboard')
   // Get the width and height of the chessboard
   const width = board.clientWidth
   const height = board.clientHeight
@@ -63,7 +70,7 @@ export function getTransformationFromChessNotation(columnAsLetter: string, row: 
   }
 }
 
-function getTransformDirections(transform) {
+function getTransformDirections(transform: string) {
   const regex = /translate\((.+)px,\s*(.+)px\)/
   const match = transform.match(regex)
 
@@ -77,7 +84,7 @@ function getTransformDirections(transform) {
   return [parseInt(x), parseInt(y)]
 }
 
-function getChessPieceLocation(piece): SerializedChessPiece {
+function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undefined {
   // Get the width and height of the chessboard
   const { width, height } = getChessBoardDimensions()
 
@@ -103,13 +110,14 @@ function getChessPieceLocation(piece): SerializedChessPiece {
 
 export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: string[]) => {
   const pieces = document.querySelectorAll('piece')
-  const hiddenPieces = []
+  const hiddenPieces: SerializedChessPiece[] = []
   pieces.forEach((piece) => {
     if (piece.className.indexOf('ghost') !== -1) return
     // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
     if (PIECES_THAT_I_CAN_HIDE?.some((pieceName) => piece.className.indexOf(pieceName) !== -1)) {
       ;(piece as HTMLElement).style.opacity = '0'
-      hiddenPieces.push(getChessPieceLocation(piece))
+      const loc = getChessPieceLocation(piece as HTMLElement)
+      if (loc) hiddenPieces.push(loc)
     } else {
       ;(piece as HTMLElement).style.opacity = '1'
     }

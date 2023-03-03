@@ -1,9 +1,11 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
-  name: 'create-chrome-ext',
-  description: '',
-  version: '0.0.0',
+  name: 'pawn-party',
+  description:
+    'This extension hides a combination of the chess pieces on the board, making parts of the position invisible to the player. ',
+
+  version: '0.6.3',
   manifest_version: 3,
   icons: {
     '16': 'img/logo-16.png',
@@ -22,7 +24,7 @@ export default defineManifest({
   // },
   content_scripts: [
     {
-      matches: ['https://lichess.org/*'],
+      matches: ['https://lichess.org/training/*'],
       js: ['src/content/index.tsx'],
     },
   ],
@@ -33,8 +35,6 @@ export default defineManifest({
     },
   ],
   permissions: [
-    'tabs', // Allows access to the tabs API
-    'activeTab', // Allows access to the currently active tab
     'scripting', // Allows content scripts to run
     'storage', // Allows access to the browser's storage API
   ],

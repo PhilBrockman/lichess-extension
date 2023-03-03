@@ -1,15 +1,15 @@
 {
-  "name": "my-crx",
-  "version": "0.0.0",
-  "author": "no one",
-  "description": "",
+  "name": "pawn-party",
+  "version": "0.6.3",
+  "author": "Phil Brockman",
+  "description": "This extension hides all the chess pieces on the board, making the position invisible to the player. This means that you have to rely on your visualization skills and memory to play chess. It's a great way to improve your visualization skills and memory.",
   "type": "module",
   "license": "MIT",
   "keywords": [
-    "chrome-extension",
-    "react",
-    "vite",
-    "create-chrome-ext"
+    "chess",
+    "visualization",
+    "memory",
+    "game"
   ],
   "engines": {
     "node": ">=14.18.0"
