@@ -1,34 +1,45 @@
-import { parseChessPieceIdentifier } from '../types'
+import {
+  ChessPieceColor,
+  ChessPieceName,
+  parseChessPieceIdentifier,
+  stringifyChessPieceIdentifier,
+} from '../types'
 import { PieceMap } from './PiecesCheckBoxes'
 
 export default function PieceCheckBox({
-  pieceType,
   isChecked,
   onChange,
+  name,
+  color,
 }: {
-  pieceType: string
+  name: ChessPieceName
+  color: ChessPieceColor
   isChecked: boolean
   onChange: (pieceType: string) => void
 }) {
   const commonClasses = 'absolute inset-0 flex items-center justify-center '
   const visibleIcon = commonClasses + 'opacity-100'
   const hiddenIcon = commonClasses + 'opacity-0'
-  const parsedPiece = parseChessPieceIdentifier(pieceType)
+
+  const pieceAsString = stringifyChessPieceIdentifier({
+    name,
+    color,
+  })
 
   return (
     <div className="flex flex-row gap-2 items-center">
       <input
         type="checkbox"
-        id={pieceType}
+        id={pieceAsString}
         checked={isChecked}
-        onChange={() => onChange(pieceType)}
+        onChange={() => onChange(pieceAsString)}
         className="cursor-pointer"
       />
-      <label htmlFor={pieceType} className="flex flex-row gap-2 items-center cursor-pointer">
+      <label htmlFor={pieceAsString} className="flex flex-row gap-2 items-center cursor-pointer">
         <div className="relative w-6 h-6">
           <div className={isChecked ? visibleIcon : hiddenIcon}>
             <span className="text-4xl text-gray-700 group-hover:text-gray-600">
-              {PieceMap[parsedPiece.color][parsedPiece.name]}
+              {PieceMap[color][name]}
             </span>
           </div>
           <div className={isChecked ? hiddenIcon : visibleIcon}>
@@ -48,16 +59,6 @@ export default function PieceCheckBox({
             </svg>
           </div>
         </div>
-
-        {/*
-          {isChecked ? (
-
-          ) : (
-            <>
-            </>
-          )}
-        </span> */}
-        <span>{pieceType}</span>
       </label>
     </div>
   )

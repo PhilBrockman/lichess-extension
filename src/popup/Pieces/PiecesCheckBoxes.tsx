@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react'
 import PieceCheckBox from './PieceCheckBox'
 import * as Tabs from '@radix-ui/react-tabs'
-import { ChessPieceColor, allCombinationsOfChessPieces, parseChessPieceIdentifier } from '../types'
+import {
+  ChessPieceColor,
+  ChessPieceName,
+  allCombinationsOfChessPieces,
+  chessPieceColors,
+  chessPieceNames,
+  parseChessPieceIdentifier,
+  stringifyChessPieceIdentifier,
+} from '../types'
 
 const ALL_HIDDEN = {
   label: 'Pieceless Puzzles',
@@ -218,22 +226,38 @@ export default function PiecesCheckBoxes({
         <div className="ml-3 space-y-3">
           <p>Choose which pieces are kept on the board:</p>
           <div className="flex flex-col gap-2 w-full">
-            {Array.from(allCombinationsOfChessPieces()).map((pieceType) => (
-              <PieceCheckBox
-                key={pieceType}
-                pieceType={pieceType}
-                isChecked={!checkedPieces?.has(pieceType)}
-                onChange={(pieceType) => {
-                  if (checkedPieces?.has(pieceType)) {
-                    setCheckedPieces(
-                      new Set(Array.from(checkedPieces).filter((p) => p !== pieceType)),
+            {Object.keys(chessPieceNames).map((n) => {
+              const name = n as ChessPieceName
+              return (
+                <div key={name} className="flex flex-row gap-1">
+                  <div className="w-1/3">{name}</div>
+                  {Object.keys(chessPieceColors).map((c) => {
+                    const color = c as ChessPieceColor
+
+                    return (
+                      <div key={`${name}-${color}`} className="w-1/3">
+                        <PieceCheckBox
+                          name={name as ChessPieceName}
+                          color={color as ChessPieceColor}
+                          isChecked={
+                            !checkedPieces?.has(stringifyChessPieceIdentifier({ name, color }))
+                          }
+                          onChange={(pieceType) => {
+                            if (checkedPieces?.has(pieceType)) {
+                              setCheckedPieces(
+                                new Set(Array.from(checkedPieces).filter((p) => p !== pieceType)),
+                              )
+                            } else {
+                              setCheckedPieces(new Set(Array.from(checkedPieces).concat(pieceType)))
+                            }
+                          }}
+                        />
+                      </div>
                     )
-                  } else {
-                    setCheckedPieces(new Set(Array.from(checkedPieces).concat(pieceType)))
-                  }
-                }}
-              />
-            ))}
+                  })}
+                </div>
+              )
+            })}
           </div>
         </div>
       </Tabs.Content>
