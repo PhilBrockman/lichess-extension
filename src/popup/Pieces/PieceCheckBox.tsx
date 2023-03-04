@@ -1,3 +1,4 @@
+import { parseChessPieceIdentifier } from '../types'
 import { PieceMap } from './PiecesCheckBoxes'
 
 export default function PieceCheckBox({
@@ -12,6 +13,7 @@ export default function PieceCheckBox({
   const commonClasses = 'absolute inset-0 flex items-center justify-center '
   const visibleIcon = commonClasses + 'opacity-100'
   const hiddenIcon = commonClasses + 'opacity-0'
+  const parsedPiece = parseChessPieceIdentifier(pieceType)
 
   return (
     <div className="flex flex-row gap-2 items-center">
@@ -26,7 +28,7 @@ export default function PieceCheckBox({
         <div className="relative w-6 h-6">
           <div className={isChecked ? visibleIcon : hiddenIcon}>
             <span className="text-4xl text-gray-700 group-hover:text-gray-600">
-              {PieceMap[pieceType as keyof typeof PieceMap]}
+              {PieceMap[parsedPiece.color][parsedPiece.name]}
             </span>
           </div>
           <div className={isChecked ? hiddenIcon : visibleIcon}>

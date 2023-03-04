@@ -1,15 +1,12 @@
-import React from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import PiecesCheckBoxes from '../Pieces/PiecesCheckBoxes'
 
 const Settings = ({
   pieces,
   setPieces,
-  disableExtension,
 }: {
-  pieces?: string[] | undefined
-  setPieces: (pieces: string[]) => void
-  disableExtension: () => void
+  pieces?: Set<string> | undefined
+  setPieces: (pieces: Set<string>) => void
 }) => {
   return (
     <Dialog.Root>

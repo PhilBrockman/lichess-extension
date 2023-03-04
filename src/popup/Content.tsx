@@ -11,8 +11,8 @@ export function Content({
   activeTab,
   setActiveTab,
 }: {
-  pieces: string[]
-  setPieces: (pieces: string[]) => void
+  pieces: Set<string>
+  setPieces: (pieces: Set<string>) => void
   hiddenPieces: SerializedChessPiece[]
   activeTab?: number
   setActiveTab: (index: number) => void

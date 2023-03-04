@@ -1,4 +1,10 @@
-import { SerializedChessPiece } from '../types'
+import {
+  ChessPiece,
+  SerializedChessPiece,
+  chessPieceColors,
+  chessPieceNames,
+  stringifyChessPieceIdentifier,
+} from '../types'
 
 function getChessPiecePosition(
   width: number,
@@ -75,7 +81,6 @@ function getTransformDirections(transform: string) {
   const match = transform.match(regex)
 
   if (!match) {
-    console.log('transform', transform)
     throw new Error(`Invalid transformation string: ${transform}`)
   }
 
@@ -108,13 +113,31 @@ function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undef
   }
 }
 
-export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: string[]) => {
+const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
+  const [color, pieceName] = classNames.split(' ') as [
+    keyof typeof chessPieceColors,
+    keyof typeof chessPieceNames,
+  ]
+  if (chessPieceNames[pieceName] === undefined) return undefined
+  if (chessPieceColors[color] === undefined) return undefined
+  return {
+    color: color,
+    name: pieceName,
+  }
+}
+
+export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: Set<string>) => {
+  if (!PIECES_THAT_I_CAN_HIDE?.size) return
   const pieces = document.querySelectorAll('piece')
   const hiddenPieces: SerializedChessPiece[] = []
   pieces.forEach((piece) => {
     if (piece.className.indexOf('ghost') !== -1) return
-    // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
-    if (PIECES_THAT_I_CAN_HIDE?.some((pieceName) => piece.className.indexOf(pieceName) !== -1)) {
+    // convert piece to a chess piece
+    const chessPiece = classNamesToChessPiece(piece.className)
+    if (!chessPiece) return
+
+    if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
+      // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
       ;(piece as HTMLElement).style.opacity = '0'
       const loc = getChessPieceLocation(piece as HTMLElement)
       if (loc) hiddenPieces.push(loc)

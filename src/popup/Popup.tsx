@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
-import { SerializedChessPiece } from './types'
+import {
+  SerializedChessPiece,
+  allCombinationsOfChessPieces,
+  stringifyChessPieceIdentifier,
+} from './types'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 import { hidePieces, showAllPieces } from './lib/hidePieces'
 import _ from 'lodash'
 import Settings from './Modal/Settings'
 
-const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES'
+const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR'
 const IS_ACTIVE = 'IS_ACTIVE'
 
 // function areElementsOverlapping(element1: HTMLElement, element2: HTMLElement) {
@@ -67,16 +71,17 @@ const basicObserver = ({ callback }: { callback: (target: any) => void }) => {
 
 function App() {
   const [isActive, setIsActive] = useState<boolean>()
-  const [pieces, setPieces] = useState<string[]>()
+  const [pieces, setPieces] = useState<Set<string>>()
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
 
   useEffect(() => {
     // load in pieces from chrome storage
     chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, IS_ACTIVE], (result) => {
       if (result[PREFERRED_HIDDEN_PIECES]) {
-        setPieces(result[PREFERRED_HIDDEN_PIECES])
+        // convert object to set
+        setPieces(new Set(Object.keys(result[PREFERRED_HIDDEN_PIECES])))
       } else {
-        setPieces(['king', 'queen', 'rook', 'bishop', 'knight'])
+        setPieces(allCombinationsOfChessPieces())
       }
       if (result[IS_ACTIVE]) {
         setIsActive(result[IS_ACTIVE])
@@ -103,16 +108,17 @@ function App() {
   }, [pieces, isActive])
 
   useEffect(() => {
+    if (pieces === undefined) return
+    // convert set to object with values of true
+    const storedPieces = Array.from(pieces).reduce((acc, piece) => {
+      acc[piece] = true
+      return acc
+    }, {} as Record<string, boolean>)
     // update chrome storage
-    chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: pieces })
+    chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: storedPieces })
     if (!isActive) return
     setHiddenPieces(hidePieces(pieces))
   }, [pieces])
-
-  const disableExtension = () => {
-    setIsActive(false)
-    showAllPieces()
-  }
 
   useEffect(() => {
     chrome.storage.sync.set({ [IS_ACTIVE]: isActive })
@@ -146,8 +152,8 @@ const Content = ({
   setIsActive,
 }: {
   isActive?: boolean
-  pieces?: string[] | undefined
-  setPieces: (pieces: string[]) => void
+  pieces?: Set<string> | undefined
+  setPieces: (pieces: Set<string>) => void
   hiddenPieces?: SerializedChessPiece[]
   setIsActive: (isActive: boolean) => void
 }) => {
@@ -157,11 +163,7 @@ const Content = ({
         <div className="">
           {isActive ? (
             <div className="justify-between flex flex-row ">
-              <Settings
-                pieces={pieces}
-                setPieces={setPieces}
-                disableExtension={() => setIsActive(false)}
-              />
+              <Settings pieces={pieces} setPieces={setPieces} />
               <div className="flex flex-row space-x-2">
                 {/* <a
                   href="https://chess.minuspieces.com/"
@@ -219,7 +221,6 @@ const Content = ({
                 setIsActive(true)
                 // scroll all the way to the bottom of the container
                 const container = document.querySelector('.puzzle__moves.areplay')
-                console.log(container)
                 if (container) {
                   setTimeout(() => {
                     container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
