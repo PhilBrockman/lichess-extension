@@ -1,41 +1,62 @@
 import { useEffect, useState } from 'react'
 import PieceCheckBox from './PieceCheckBox'
 import * as Tabs from '@radix-ui/react-tabs'
-
-const pieceTypes = ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king']
+import {
+  ChessPieceColor,
+  ChessPieceName,
+  chessPieceColors,
+  chessPieceNames,
+  parseChessPieceIdentifier,
+  stringifyChessPieceIdentifier,
+} from '../types'
+import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
 
 const ALL_HIDDEN = {
   label: 'Pieceless Puzzles',
   helper: 'Hide all game pieces',
-  data: ['pawn', 'rook', 'knight', 'bishop', 'queen', 'king'],
+  data: new Set([
+    'white_king',
+    'white_queen',
+    'white_rook',
+    'white_bishop',
+    'white_knight',
+    'white_pawn',
+    'black_king',
+    'black_queen',
+    'black_rook',
+    'black_bishop',
+    'black_knight',
+    'black_pawn',
+  ]),
 }
 const PAWNS_ONLY = {
   label: 'Pawn Party',
   helper: 'Hide all pieces except pawns',
-  data: ['rook', 'knight', 'bishop', 'queen', 'king'],
+  data: new Set([
+    'white_king',
+    'white_queen',
+    'white_rook',
+    'white_bishop',
+    'white_knight',
+    'black_king',
+    'black_queen',
+    'black_rook',
+    'black_bishop',
+    'black_knight',
+  ]),
 }
 const KINGS_ROOKS_AND_QUEENS = {
   label: 'Vive la révolution!',
-  helper: 'The king and queen are nowhere to be found',
-  data: ['queen', 'king'],
+  helper: 'The kings and queens are nowhere to be found',
+  data: new Set(['white_king', 'white_queen', 'black_king', 'black_queen']),
 }
 
-function arraysAreEqual(arr1: string[], arr2: string[]) {
-  // Sort both arrays
-  const sortedArr1 = arr1.slice().sort()
-  const sortedArr2 = arr2.slice().sort()
-
-  // Compare the sorted arrays using JSON.stringify()
-  return JSON.stringify(sortedArr1) === JSON.stringify(sortedArr2)
-}
-
-export const PieceMap = {
-  king: '♔',
-  queen: '♕',
-  rook: '♖',
-  bishop: '♗',
-  knight: '♘',
-  pawn: '♙',
+function areSetsEqual(set1: Set<string>, set2: Set<string>) {
+  if (set1.size !== set2.size) return false
+  for (const item of set1) {
+    if (!set2.has(item)) return false
+  }
+  return true
 }
 
 const Preset = ({
@@ -46,9 +67,9 @@ const Preset = ({
   preset: {
     label: string
     helper: string
-    data: string[]
+    data: Set<string>
   }
-  setCheckedPieces: (pieces: string[]) => void
+  setCheckedPieces: (pieces: Set<string>) => void
   isActive: boolean
 }) => {
   const commonClasses =
@@ -57,6 +78,24 @@ const Preset = ({
     'bg-blue-100 text-gray-800 hover:text-gray-900 cursor-default border-blue-500'
   const inactiveClasses =
     'cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border-gray-300'
+
+  const invertedPiecRow = (color: ChessPieceColor) =>
+    Object.keys(chessPieceNames).map((n) => {
+      const name = n as ChessPieceName
+      const piece = stringifyChessPieceIdentifier({ color, name })
+      if (preset.data.has(piece)) return null
+      return (
+        <img
+          key={piece}
+          src={urlFromPiece({
+            name,
+            color,
+          })}
+          className="w-6 h-6"
+        />
+      )
+    })
+
   return (
     <div key={preset.label} className="relative">
       <div
@@ -83,12 +122,9 @@ const Preset = ({
           </div>
         )}
         <div className="text-center text-xl">{preset.label}</div>
-        <div className="flex flex-row gap-1">
-          {preset.data.map((piece) => (
-            <span key={piece} className="text-4xl text-gray-400 group-hover:text-gray-600">
-              {PieceMap[piece as keyof typeof PieceMap]}
-            </span>
-          ))}
+        <div>
+          <div className="flex flex-row gap-1 justify-between">{invertedPiecRow('white')}</div>
+          <div className="flex flex-row gap-1 justify-between">{invertedPiecRow('black')}</div>
         </div>
         <p className="text-md text-gray-500 group-hover:text-gray-700">{preset.helper}</p>
       </div>
@@ -122,8 +158,8 @@ export default function PiecesCheckBoxes({
   pieces,
   onChange,
 }: {
-  pieces: string[]
-  onChange: (pieces: string[]) => void
+  pieces: Set<string>
+  onChange: (pieces: Set<string>) => void
 }) {
   const [checkedPieces, setCheckedPieces] = useState(pieces)
 
@@ -137,10 +173,10 @@ export default function PiecesCheckBoxes({
     {
       label: 'Show all pieces',
       helper: 'Always show all pieces',
-      data: [],
+      data: new Set<string>([]),
     },
   ]
-  const isUsingPreconfigured = preconfigured.some((p) => arraysAreEqual(p.data, checkedPieces))
+  const isUsingPreconfigured = preconfigured.some((p) => areSetsEqual(p.data, checkedPieces))
   const [activeTab, setActiveTab] = useState(isUsingPreconfigured ? 'tab1' : 'tab2')
   return (
     <Tabs.Root
@@ -159,14 +195,16 @@ export default function PiecesCheckBoxes({
       </Tabs.List>
       <Tabs.Content className="grow p-5 bg-white rounded-b-md outline-none " value="tab1">
         <div className="ml-3 space-y-3 text-gray-500">
-          <p>Use the presets to choose which pieces are hidden in your games</p>
+          <p className="text-gray-300 hover:text-gray-500 hover:border-2 hover:border-gray-300 hover:bg-gray-100 rounded-md p-2">
+            Use the presets to choose which pieces are hidden in your games
+          </p>
           <div className="flex flex-col gap-2 w-full">
             {preconfigured.map((preset) => (
               <Preset
                 key={preset.label}
                 preset={preset}
                 setCheckedPieces={setCheckedPieces}
-                isActive={arraysAreEqual(checkedPieces, preset.data)}
+                isActive={areSetsEqual(checkedPieces, preset.data)}
               />
             ))}
           </div>
@@ -179,20 +217,38 @@ export default function PiecesCheckBoxes({
         <div className="ml-3 space-y-3">
           <p>Choose which pieces are kept on the board:</p>
           <div className="flex flex-col gap-2 w-full">
-            {pieceTypes.map((pieceType) => (
-              <PieceCheckBox
-                key={pieceType}
-                pieceType={pieceType}
-                isChecked={!checkedPieces.includes(pieceType)}
-                onChange={(pieceType) => {
-                  if (checkedPieces.includes(pieceType)) {
-                    setCheckedPieces(checkedPieces.filter((p) => p !== pieceType))
-                  } else {
-                    setCheckedPieces([...checkedPieces, pieceType])
-                  }
-                }}
-              />
-            ))}
+            {Object.keys(chessPieceNames).map((n) => {
+              const name = n as ChessPieceName
+              return (
+                <div key={name} className="flex flex-row gap-1">
+                  <div className="w-1/3">{name}</div>
+                  {Object.keys(chessPieceColors).map((c) => {
+                    const color = c as ChessPieceColor
+
+                    return (
+                      <div key={`${name}-${color}`} className="w-1/3">
+                        <PieceCheckBox
+                          name={name as ChessPieceName}
+                          color={color as ChessPieceColor}
+                          isChecked={
+                            !checkedPieces?.has(stringifyChessPieceIdentifier({ name, color }))
+                          }
+                          onChange={(pieceType) => {
+                            if (checkedPieces?.has(pieceType)) {
+                              setCheckedPieces(
+                                new Set(Array.from(checkedPieces).filter((p) => p !== pieceType)),
+                              )
+                            } else {
+                              setCheckedPieces(new Set(Array.from(checkedPieces).concat(pieceType)))
+                            }
+                          }}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })}
           </div>
         </div>
       </Tabs.Content>

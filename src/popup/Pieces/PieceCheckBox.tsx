@@ -1,11 +1,14 @@
-import { PieceMap } from './PiecesCheckBoxes'
+import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
+import { ChessPieceColor, ChessPieceName, stringifyChessPieceIdentifier } from '../types'
 
 export default function PieceCheckBox({
-  pieceType,
   isChecked,
   onChange,
+  name,
+  color,
 }: {
-  pieceType: string
+  name: ChessPieceName
+  color: ChessPieceColor
   isChecked: boolean
   onChange: (pieceType: string) => void
 }) {
@@ -13,20 +16,30 @@ export default function PieceCheckBox({
   const visibleIcon = commonClasses + 'opacity-100'
   const hiddenIcon = commonClasses + 'opacity-0'
 
+  const pieceAsString = stringifyChessPieceIdentifier({
+    name,
+    color,
+  })
+
   return (
     <div className="flex flex-row gap-2 items-center">
       <input
         type="checkbox"
-        id={pieceType}
+        id={pieceAsString}
         checked={isChecked}
-        onChange={() => onChange(pieceType)}
+        onChange={() => onChange(pieceAsString)}
         className="cursor-pointer"
       />
-      <label htmlFor={pieceType} className="flex flex-row gap-2 items-center cursor-pointer">
+      <label htmlFor={pieceAsString} className="flex flex-row gap-2 items-center cursor-pointer">
         <div className="relative w-6 h-6">
           <div className={isChecked ? visibleIcon : hiddenIcon}>
             <span className="text-4xl text-gray-700 group-hover:text-gray-600">
-              {PieceMap[pieceType as keyof typeof PieceMap]}
+              <img
+                src={urlFromPiece({
+                  name,
+                  color,
+                })}
+              />
             </span>
           </div>
           <div className={isChecked ? hiddenIcon : visibleIcon}>
@@ -46,16 +59,6 @@ export default function PieceCheckBox({
             </svg>
           </div>
         </div>
-
-        {/*
-          {isChecked ? (
-
-          ) : (
-            <>
-            </>
-          )}
-        </span> */}
-        <span>{pieceType}</span>
       </label>
     </div>
   )

@@ -8,20 +8,16 @@ export default defineManifest({
   version: '0.6.3',
   manifest_version: 3,
   icons: {
-    '16': 'img/logo-16.png',
-    '32': 'img/logo-34.png',
-    '48': 'img/logo-48.png',
-    '128': 'img/logo-128.png',
+    '16': 'img/img-16.png',
+    '38': 'img/img-38.png',
+    '48': 'img/img-48.png',
+    '148': 'img/img-148.png',
   },
   // action: {
   //   default_popup: 'popup.html',
   //   default_icon: 'img/logo-48.png',
   // },
   // options_page: 'options.html',
-  // background: {
-  //   service_worker: 'src/background/index.ts',
-  //   type: 'module',
-  // },
   content_scripts: [
     {
       matches: ['https://lichess.org/training/*'],
@@ -30,11 +26,12 @@ export default defineManifest({
   ],
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-34.png', 'img/logo-48.png', 'img/logo-128.png'],
+      resources: ['img/img-16.png', 'img/img-38.png', 'img/img-48.png', 'img/img-148.png'],
       matches: [],
     },
   ],
   permissions: [
+    'scripting', // Allows content scripts to run
     'storage', // Allows access to the browser's storage API
   ],
 })
