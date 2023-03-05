@@ -1,10 +1,5 @@
-import {
-  ChessPieceColor,
-  ChessPieceName,
-  parseChessPieceIdentifier,
-  stringifyChessPieceIdentifier,
-} from '../types'
-import { PieceMap } from './PiecesCheckBoxes'
+import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
+import { ChessPieceColor, ChessPieceName, stringifyChessPieceIdentifier } from '../types'
 
 export default function PieceCheckBox({
   isChecked,
@@ -39,7 +34,12 @@ export default function PieceCheckBox({
         <div className="relative w-6 h-6">
           <div className={isChecked ? visibleIcon : hiddenIcon}>
             <span className="text-4xl text-gray-700 group-hover:text-gray-600">
-              {PieceMap[color][name]}
+              <img
+                src={urlFromPiece({
+                  name,
+                  color,
+                })}
+              />
             </span>
           </div>
           <div className={isChecked ? hiddenIcon : visibleIcon}>

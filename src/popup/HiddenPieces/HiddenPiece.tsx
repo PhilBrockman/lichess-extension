@@ -1,24 +1,36 @@
-import { SerializedChessPiece } from '../types'
+import { ChessPiece, SerializedChessPiece, isValidColor, isValidName } from '../types'
 
-export function HiddenPiece(piece: SerializedChessPiece) {
-  if (piece.color === 'ghost') return null
-
+export const urlFromPiece = (piece: ChessPiece) => {
   const letter =
-    piece.pieceName === 'king'
+    piece.name === 'king'
       ? 'k'
-      : piece.pieceName === 'queen'
+      : piece.name === 'queen'
       ? 'q'
-      : piece.pieceName === 'bishop'
+      : piece.name === 'bishop'
       ? 'b'
-      : piece.pieceName === 'knight'
+      : piece.name === 'knight'
       ? 'n'
-      : piece.pieceName === 'rook'
+      : piece.name === 'rook'
       ? 'r'
       : 'p'
+  return `https://www.chess.com/chess-themes/pieces/neo/150/${piece.color.slice(0, 1) + letter}.png`
+}
 
-  const url = `https://www.chess.com/chess-themes/pieces/neo/150/${
-    piece.color.slice(0, 1) + letter
-  }.png`
+export function HiddenPiece(piece: SerializedChessPiece) {
+  if (piece.color === 'ghost') {
+    return null
+  }
+  if (!isValidColor(piece.color)) {
+    throw new Error('Invalid color: ' + piece.color!)
+  }
+  if (!isValidName(piece.pieceName)) {
+    throw new Error('Invalid name: ' + piece.pieceName)
+  }
+
+  const url = urlFromPiece({
+    color: piece.color,
+    name: piece.pieceName,
+  })
 
   const handleClick = () => {
     // if the piece is already visible, make it invisible

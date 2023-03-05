@@ -41,6 +41,14 @@ export type ChessPiece = {
   color: ChessPieceColor
 }
 
+export const isValidColor = (color: string): color is ChessPieceColor => {
+  return chessPieceColors[color as ChessPieceColor] !== undefined
+}
+
+export const isValidName = (name: string): name is ChessPieceName => {
+  return chessPieceNames[name as ChessPieceName] !== undefined
+}
+
 export const stringifyChessPieceIdentifier = (piece: ChessPiece) => {
   return `${piece.color}_${piece.name}`
 }

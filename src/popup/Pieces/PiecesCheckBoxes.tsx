@@ -4,12 +4,12 @@ import * as Tabs from '@radix-ui/react-tabs'
 import {
   ChessPieceColor,
   ChessPieceName,
-  allCombinationsOfChessPieces,
   chessPieceColors,
   chessPieceNames,
   parseChessPieceIdentifier,
   stringifyChessPieceIdentifier,
 } from '../types'
+import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
 
 const ALL_HIDDEN = {
   label: 'Pieceless Puzzles',
@@ -59,25 +59,6 @@ function areSetsEqual(set1: Set<string>, set2: Set<string>) {
   return true
 }
 
-export const PieceMap = {
-  white: {
-    king: '♔',
-    queen: '♕',
-    rook: '♖',
-    bishop: '♗',
-    knight: '♘',
-    pawn: '♙',
-  },
-  black: {
-    king: '♚',
-    queen: '♛',
-    rook: '♜',
-    bishop: '♝',
-    knight: '♞',
-    pawn: '♟︎',
-  },
-}
-
 const Preset = ({
   preset,
   setCheckedPieces,
@@ -97,16 +78,24 @@ const Preset = ({
     'bg-blue-100 text-gray-800 hover:text-gray-900 cursor-default border-blue-500'
   const inactiveClasses =
     'cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border-gray-300'
-  const PieceRow = (color: ChessPieceColor) =>
-    Array.from(preset.data).map((piece) => {
-      const parsedPiece = parseChessPieceIdentifier(piece)
-      if (parsedPiece.color !== color) return null
+
+  const invertedPiecRow = (color: ChessPieceColor) =>
+    Object.keys(chessPieceNames).map((n) => {
+      const name = n as ChessPieceName
+      const piece = stringifyChessPieceIdentifier({ color, name })
+      if (preset.data.has(piece)) return null
       return (
-        <span key={piece} className="text-4xl text-gray-400 group-hover:text-gray-600">
-          {PieceMap[color][parsedPiece.name]}
-        </span>
+        <img
+          key={piece}
+          src={urlFromPiece({
+            name,
+            color,
+          })}
+          className="w-6 h-6"
+        />
       )
     })
+
   return (
     <div key={preset.label} className="relative">
       <div
@@ -134,8 +123,8 @@ const Preset = ({
         )}
         <div className="text-center text-xl">{preset.label}</div>
         <div>
-          <div className="flex flex-row gap-1">{PieceRow('white')}</div>
-          <div className="flex flex-row gap-1">{PieceRow('black')}</div>
+          <div className="flex flex-row gap-1 justify-between">{invertedPiecRow('white')}</div>
+          <div className="flex flex-row gap-1 justify-between">{invertedPiecRow('black')}</div>
         </div>
         <p className="text-md text-gray-500 group-hover:text-gray-700">{preset.helper}</p>
       </div>
@@ -206,7 +195,9 @@ export default function PiecesCheckBoxes({
       </Tabs.List>
       <Tabs.Content className="grow p-5 bg-white rounded-b-md outline-none " value="tab1">
         <div className="ml-3 space-y-3 text-gray-500">
-          <p>Use the presets to choose which pieces are hidden in your games</p>
+          <p className="text-gray-300 hover:text-gray-500 hover:border-2 hover:border-gray-300 hover:bg-gray-100 rounded-md p-2">
+            Use the presets to choose which pieces are hidden in your games
+          </p>
           <div className="flex flex-col gap-2 w-full">
             {preconfigured.map((preset) => (
               <Preset
