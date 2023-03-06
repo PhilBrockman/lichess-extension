@@ -31,7 +31,6 @@ export default defineManifest({
     },
   ],
   permissions: [
-    'scripting', // Allows content scripts to run
     'storage', // Allows access to the browser's storage API
   ],
 })
