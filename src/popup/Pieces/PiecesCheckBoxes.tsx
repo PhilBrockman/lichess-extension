@@ -178,6 +178,28 @@ export default function PiecesCheckBoxes({
   ]
   const isUsingPreconfigured = preconfigured.some((p) => areSetsEqual(p.data, checkedPieces))
   const [activeTab, setActiveTab] = useState(isUsingPreconfigured ? 'tab1' : 'tab2')
+
+  const WHITE_PIECES = [
+    'white_pawn',
+    'white_knight',
+    'white_bishop',
+    'white_rook',
+    'white_queen',
+    'white_king',
+  ]
+  const BLACK_PIECES = [
+    'black_pawn',
+    'black_knight',
+    'black_bishop',
+    'black_rook',
+    'black_queen',
+    'black_king',
+  ]
+  const isUsingEveryWhitePiece = WHITE_PIECES.every((p) => checkedPieces.has(p))
+  const isUsingEveryBlackPiece = BLACK_PIECES.every((p) => checkedPieces.has(p))
+  const isUsingNoWhitePiece = WHITE_PIECES.every((p) => !checkedPieces.has(p))
+  const isUsingNoBlackPiece = BLACK_PIECES.every((p) => !checkedPieces.has(p))
+
   return (
     <Tabs.Root
       className="flex flex-col w-[300px] shadow-[0_2px_10px] shadow-blackA4"
@@ -217,6 +239,46 @@ export default function PiecesCheckBoxes({
         <div className="ml-3 space-y-3">
           <p>Choose which pieces are kept on the board:</p>
           <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-row gap-1">
+              <div className="w-1/3"></div>
+              <div className="w-1/3">
+                <div
+                  id="white-pieces-toggle"
+                  role="button"
+                  onClick={() => {
+                    if (isUsingNoWhitePiece) {
+                      setCheckedPieces(new Set(Array.from(checkedPieces).concat(WHITE_PIECES)))
+                    } else {
+                      setCheckedPieces(
+                        new Set(Array.from(checkedPieces).filter((p) => !WHITE_PIECES.includes(p))),
+                      )
+                    }
+                  }}
+                  className="cursor-pointer underline"
+                >
+                  {isUsingNoWhitePiece ? 'Remove all' : 'Add all'}
+                </div>
+              </div>
+
+              <div className="w-1/3">
+                <div
+                  id="black-pieces-toggle"
+                  role="button"
+                  onClick={() => {
+                    if (isUsingNoBlackPiece) {
+                      setCheckedPieces(new Set(Array.from(checkedPieces).concat(BLACK_PIECES)))
+                    } else {
+                      setCheckedPieces(
+                        new Set(Array.from(checkedPieces).filter((p) => !BLACK_PIECES.includes(p))),
+                      )
+                    }
+                  }}
+                  className="cursor-pointer underline"
+                >
+                  {isUsingNoBlackPiece ? 'Remove all' : 'Add all'}
+                </div>
+              </div>
+            </div>
             {Object.keys(chessPieceNames).map((n) => {
               const name = n as ChessPieceName
               return (
