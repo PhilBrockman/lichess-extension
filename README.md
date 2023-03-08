@@ -1,4 +1,4 @@
-# my-crx
+# Pawn Party
 
 > a chrome extension tools built with Vite + React, and Manifest v3
 
