@@ -1,10 +1,18 @@
 import {
   ChessPiece,
+  ChessPieceColor,
   SerializedChessPiece,
   chessPieceColors,
   chessPieceNames,
   stringifyChessPieceIdentifier,
 } from '../types'
+
+function getBoardOrientation(): ChessPieceColor {
+  const boardParent = document.querySelector('cg-container')?.parentElement
+  if (!boardParent) throw new Error('Could not find board parent')
+
+  return boardParent.classList.contains('orientation-white') ? 'white' : 'black'
+}
 
 function getChessPiecePosition(
   width: number,
@@ -20,7 +28,7 @@ function getChessPiecePosition(
   const finalX = transformX + squareSize / 2 // add half of square size to account for the piece's center position
   const finalY = transformY + squareSize / 2
 
-  if (boardParent.classList.contains('orientation-white')) {
+  if (getBoardOrientation() === 'white') {
     // Divide the final position of the piece by the size of each square to get its rank and file
     const file = 1 + Math.floor(finalX / squareSize)
     const rank = 8 - Math.floor(finalY / squareSize) // invert the y-coordinate to account for the fact that the board is numbered from bottom to top
