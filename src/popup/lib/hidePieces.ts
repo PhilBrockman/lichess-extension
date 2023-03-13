@@ -10,7 +10,6 @@ import {
 function getBoardOrientation(): ChessPieceColor {
   const boardParent = document.querySelector('cg-container')?.parentElement
   if (!boardParent) throw new Error('Could not find board parent')
-
   return boardParent.classList.contains('orientation-white') ? 'white' : 'black'
 }
 
