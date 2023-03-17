@@ -101,14 +101,13 @@ function App() {
 
   const hidePiecesHandler = () => {
     if (pieces === undefined) return
-    if (!isActive) return
-    console.log('hidePiecesHandler', pieces)
+    if (!isActive) return showAllPieces()
     setHiddenPieces(hidePieces(pieces))
   }
 
   useEffect(() => {
     if (!isActive) return
-    const obs3 = basicObserver({
+    const obs = basicObserver({
       callback: _.debounce(
         () => {
           hidePiecesHandler()
@@ -117,31 +116,18 @@ function App() {
         { leading: true },
       ),
     })
+    hidePiecesHandler()
     return () => {
-      obs3?.disconnect()
+      obs?.disconnect()
     }
   }, [pieces, isActive])
-
-  useEffect(() => {
-    hidePiecesHandler()
-  }, [pieces])
-
-  useEffect(() => {
-    if (!isActive) {
-      showAllPieces()
-    } else {
-      hidePiecesHandler()
-    }
-  }, [isActive])
-
-  if (pieces === undefined) return null
 
   return (
     <div className="space-y-3" style={{ zIndex: 1000 }}>
       <div className="text-sm font-medium text-center text-gray-500 border-gray-200 py-3 ">
         <Content
           isActive={isActive}
-          pieces={new Set(Object.keys(pieces))}
+          pieces={pieces}
           setPieces={setPieces}
           hiddenPieces={hiddenPieces}
           setIsActive={setIsActive}
