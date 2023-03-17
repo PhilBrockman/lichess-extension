@@ -133,25 +133,46 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
   }
 }
 
-export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>) => {
+export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: number): number => {
   const pieces = document.querySelectorAll('piece')
   const hiddenPieces: SerializedChessPiece[] = []
+
+  // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
     if (piece.className.indexOf('ghost') !== -1) return
-    // convert piece to a chess piece
+
+    // Convert piece to a chess piece
     const chessPiece = classNamesToChessPiece(piece.className)
     if (!chessPiece) return
 
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
-      // if any of the class names are in PIECES_THAT_I_CAN_HIDE, hide the piece
-      ;(piece as HTMLElement).style.opacity = '0'
-      const loc = getChessPieceLocation(piece as HTMLElement)
-      if (loc) hiddenPieces.push(loc)
+      ;(piece as HTMLElement).style.opacity = '0.7'
     } else {
       ;(piece as HTMLElement).style.opacity = '1'
     }
   })
-  return hiddenPieces
+
+  // Set a timer to hide the pieces
+  const interval = window.setTimeout(() => {
+    pieces.forEach((piece) => {
+      if (piece.className.indexOf('ghost') !== -1) return
+
+      // Convert piece to a chess piece
+      const chessPiece = classNamesToChessPiece(piece.className)
+      if (!chessPiece) return
+
+      if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
+        // Hide the piece
+        ;(piece as HTMLElement).style.opacity = '0'
+        const loc = getChessPieceLocation(piece as HTMLElement)
+        if (loc) hiddenPieces.push(loc)
+      } else {
+        ;(piece as HTMLElement).style.opacity = '1'
+      }
+    })
+  }, delayTime)
+
+  return interval
 }
 
 export const showAllPieces = () => {
