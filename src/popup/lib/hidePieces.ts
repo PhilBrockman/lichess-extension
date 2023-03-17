@@ -133,8 +133,7 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
   }
 }
 
-export const hidePieces = (PIECES_THAT_I_CAN_HIDE?: Set<string>) => {
-  if (!PIECES_THAT_I_CAN_HIDE?.size) return
+export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>) => {
   const pieces = document.querySelectorAll('piece')
   const hiddenPieces: SerializedChessPiece[] = []
   pieces.forEach((piece) => {

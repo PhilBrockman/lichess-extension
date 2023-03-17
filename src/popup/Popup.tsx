@@ -8,6 +8,7 @@ import Settings from './Modal/Settings'
 const version = '_V3'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR' + version
 const IS_ACTIVE = 'IS_ACTIVE' + version
+const DELAY_ON_HIDE = 'DELAY_ON_HIDE' + version
 
 const basicObserver = ({ callback }: { callback: (target: any) => void }) => {
   const observer = new MutationObserver((mutationsList, observer) => {
@@ -91,6 +92,7 @@ function useStorageSyncState<T extends SavableTypes>(key: string, defaultValue: 
 function App() {
   // saved settings
   const [isActive, setIsActive] = useStorageSyncState<boolean>(IS_ACTIVE, false)
+  const delayOnHide = useStorageSyncState<number>(DELAY_ON_HIDE, 300)
   const [pieces, setPieces] = useStorageSyncState<Set<string>>(
     PREFERRED_HIDDEN_PIECES,
     allCombinationsOfChessPieces(),
@@ -116,7 +118,6 @@ function App() {
         { leading: true },
       ),
     })
-    hidePiecesHandler()
     return () => {
       obs?.disconnect()
     }
