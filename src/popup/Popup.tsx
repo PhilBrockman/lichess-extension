@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react'
-import {
-  SerializedChessPiece,
-  allCombinationsOfChessPieces,
-  stringifyChessPieceIdentifier,
-} from './types'
+import { SerializedChessPiece, allCombinationsOfChessPieces } from './types'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 import { hidePieces, showAllPieces } from './lib/hidePieces'
 import _ from 'lodash'
 import Settings from './Modal/Settings'
 
-const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR'
-const IS_ACTIVE = 'IS_ACTIVE'
+const version = '_V3'
+const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR' + version
+const IS_ACTIVE = 'IS_ACTIVE' + version
 
 const basicObserver = ({ callback }: { callback: (target: any) => void }) => {
   const observer = new MutationObserver((mutationsList, observer) => {
@@ -47,35 +44,75 @@ const basicObserver = ({ callback }: { callback: (target: any) => void }) => {
   observer.observe(document.body, config)
   return observer
 }
+type SavableTypes = Set<string> | object | number | string | boolean
+const savingOperations = <T extends SavableTypes>(defaultValue: T) => {
+  if (defaultValue instanceof Set) {
+    return {
+      parse: (value: string) => new Set(JSON.parse(value)),
+      stringify: (value: T) => JSON.stringify(Array.from(value as Set<string>)),
+    }
+  } else if (typeof defaultValue === 'object') {
+    return {
+      parse: (value: string) => JSON.parse(value),
+      stringify: (value: T) => JSON.stringify(value),
+    }
+  } else {
+    return {
+      parse: (value: string) => value,
+      stringify: (value: T) => value,
+    }
+  }
+}
 
-function App() {
-  const [isActive, setIsActive] = useState<boolean>()
-  const [pieces, setPieces] = useState<Set<string>>()
-  const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
+function useStorageSyncState<T extends SavableTypes>(key: string, defaultValue: T) {
+  const { parse, stringify } = savingOperations(defaultValue)
+  const [state, setState] = useState<T>()
 
   useEffect(() => {
-    // load in pieces from chrome storage
-    chrome.storage.sync.get([PREFERRED_HIDDEN_PIECES, IS_ACTIVE], (result) => {
-      if (result[PREFERRED_HIDDEN_PIECES]) {
-        // convert object to set
-        setPieces(new Set(Object.keys(result[PREFERRED_HIDDEN_PIECES])))
+    chrome.storage.sync.get([key], (result) => {
+      console.log('useStorageSyncState', key, result)
+      if (result[key] !== undefined) {
+        setState(parse(result[key]))
       } else {
-        setPieces(allCombinationsOfChessPieces())
-      }
-      if (result[IS_ACTIVE]) {
-        setIsActive(result[IS_ACTIVE])
-      } else {
-        setIsActive(false)
+        setState(defaultValue)
       }
     })
   }, [])
+
+  const setStorageState = (value: T) => {
+    chrome.storage.sync.set({ [key]: stringify(value) }, () => {
+      setState(value)
+    })
+  }
+
+  return [state, setStorageState] as const
+}
+
+function App() {
+  // saved settings
+  const [isActive, setIsActive] = useStorageSyncState<boolean>(IS_ACTIVE, false)
+  const [pieces, setPieces] = useStorageSyncState<Set<string>>(
+    PREFERRED_HIDDEN_PIECES,
+    allCombinationsOfChessPieces(),
+  )
+
+  // local state
+  const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
+
+  const hidePiecesHandler = () => {
+    if (pieces === undefined) return
+    if (!isActive) return
+    console.log('hidePiecesHandler', pieces)
+    // const saveableHiddenPieces = new Set(Object.keys(pieces))
+    setHiddenPieces(hidePieces(pieces))
+  }
 
   useEffect(() => {
     if (!isActive) return
     const obs3 = basicObserver({
       callback: _.debounce(
         () => {
-          setHiddenPieces(hidePieces(pieces))
+          hidePiecesHandler()
         },
         300,
         { leading: true },
@@ -87,33 +124,25 @@ function App() {
   }, [pieces, isActive])
 
   useEffect(() => {
-    if (pieces === undefined) return
-    // convert set to object with values of true
-    const storedPieces = Array.from(pieces).reduce((acc, piece) => {
-      acc[piece] = true
-      return acc
-    }, {} as Record<string, boolean>)
-    // update chrome storage
-    chrome.storage.sync.set({ [PREFERRED_HIDDEN_PIECES]: storedPieces })
-    if (!isActive) return
-    setHiddenPieces(hidePieces(pieces))
+    hidePiecesHandler()
   }, [pieces])
 
   useEffect(() => {
-    chrome.storage.sync.set({ [IS_ACTIVE]: isActive })
     if (!isActive) {
       showAllPieces()
     } else {
-      setHiddenPieces(hidePieces(pieces))
+      hidePiecesHandler()
     }
   }, [isActive])
+
+  if (pieces === undefined) return null
 
   return (
     <div className="space-y-3" style={{ zIndex: 1000 }}>
       <div className="text-sm font-medium text-center text-gray-500 border-gray-200 py-3 ">
         <Content
           isActive={isActive}
-          pieces={pieces}
+          pieces={new Set(Object.keys(pieces))}
           setPieces={setPieces}
           hiddenPieces={hiddenPieces}
           setIsActive={setIsActive}
