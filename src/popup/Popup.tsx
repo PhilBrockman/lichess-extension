@@ -4,90 +4,13 @@ import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 import { hidePieces, showAllPieces } from './lib/hidePieces'
 import _ from 'lodash'
 import Settings from './Modal/Settings'
+import { useStorageSyncState } from './useStorageSyncState'
+import { basicObserver } from './basicObserver'
 
 const version = '_V3'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR' + version
 const IS_ACTIVE = 'IS_ACTIVE' + version
 const DELAY_ON_HIDE = 'DELAY_ON_HIDE' + version
-
-const basicObserver = ({ callback }: { callback: (target: any) => void }) => {
-  const observer = new MutationObserver((mutationsList, observer) => {
-    for (const mutation of mutationsList) {
-      if (mutation.type === 'childList') {
-        // Check if a <piece> element was added or removed
-        for (const node of mutation.addedNodes) {
-          if ((node as any).tagName === 'PIECE') {
-            // console.log('A <piece> element was added to the <cg-board>!')
-            callback(mutation.target)
-          }
-        }
-        for (const node of mutation.removedNodes) {
-          if ((node as any).tagName === 'PIECE') {
-            // console.log('A <piece> element was removed from the <cg-board>!')
-            callback(mutation.target)
-          }
-        }
-      } else if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-        // Check if the 'anim' class was removed from a <piece> element
-        const target = mutation.target
-        if ((target as any).tagName === 'PIECE' && !(target as any).classList.contains('anim')) {
-          // console.log("The 'anim' class was removed from a <piece> element!")
-          callback(mutation.target)
-        }
-      }
-    }
-  })
-
-  // Options for the observer (which mutations to observe)
-  const config = { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }
-
-  // Start observing the target node for configured mutations
-  observer.observe(document.body, config)
-  return observer
-}
-type SavableTypes = Set<string> | object | number | string | boolean
-const savingOperations = <T extends SavableTypes>(defaultValue: T) => {
-  if (defaultValue instanceof Set) {
-    return {
-      parse: (value: string) => new Set(JSON.parse(value)),
-      stringify: (value: T) => JSON.stringify(Array.from(value as Set<string>)),
-    }
-  } else if (typeof defaultValue === 'object') {
-    return {
-      parse: (value: string) => JSON.parse(value),
-      stringify: (value: T) => JSON.stringify(value),
-    }
-  } else {
-    return {
-      parse: (value: string) => value,
-      stringify: (value: T) => value,
-    }
-  }
-}
-
-function useStorageSyncState<T extends SavableTypes>(key: string, defaultValue: T) {
-  const { parse, stringify } = savingOperations(defaultValue)
-  const [state, setState] = useState<T>()
-
-  useEffect(() => {
-    chrome.storage.sync.get([key], (result) => {
-      console.log('useStorageSyncState', key, result)
-      if (result[key] !== undefined) {
-        setState(parse(result[key]))
-      } else {
-        setState(defaultValue)
-      }
-    })
-  }, [])
-
-  const setStorageState = (value: T) => {
-    chrome.storage.sync.set({ [key]: stringify(value) }, () => {
-      setState(value)
-    })
-  }
-
-  return [state ?? defaultValue, setStorageState] as const
-}
 
 function App() {
   // saved settings
