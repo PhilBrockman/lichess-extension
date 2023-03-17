@@ -1,3 +1,5 @@
+export type SavableTypes = Set<string> | object | number | string | boolean
+
 export const chessPieceNames = {
   pawn: true,
   knight: true,
