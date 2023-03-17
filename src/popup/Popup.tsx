@@ -86,13 +86,13 @@ function useStorageSyncState<T extends SavableTypes>(key: string, defaultValue: 
     })
   }
 
-  return [state, setStorageState] as const
+  return [state ?? defaultValue, setStorageState] as const
 }
 
 function App() {
   // saved settings
   const [isActive, setIsActive] = useStorageSyncState<boolean>(IS_ACTIVE, false)
-  const delayOnHide = useStorageSyncState<number>(DELAY_ON_HIDE, 300)
+  const [delayOnHide, setDelayOnHide] = useStorageSyncState<number>(DELAY_ON_HIDE, 2000)
   const [pieces, setPieces] = useStorageSyncState<Set<string>>(
     PREFERRED_HIDDEN_PIECES,
     allCombinationsOfChessPieces(),
@@ -100,11 +100,18 @@ function App() {
 
   // local state
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
+  const [hidingInterval, setHidingInterval] = useState<number | undefined>()
 
+  // hide pieces on load
   const hidePiecesHandler = () => {
     if (pieces === undefined) return
     if (!isActive) return showAllPieces()
-    setHiddenPieces(hidePieces(pieces))
+    if (hidingInterval) {
+      clearInterval(hidingInterval)
+    }
+    const { interval, hiddenPieces } = hidePieces(pieces, delayOnHide)
+    setHidingInterval(interval)
+    setHiddenPieces(hiddenPieces)
   }
 
   useEffect(() => {

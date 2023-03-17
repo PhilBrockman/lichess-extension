@@ -133,7 +133,7 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
   }
 }
 
-export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: number): number => {
+export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: number) => {
   const pieces = document.querySelectorAll('piece')
   const hiddenPieces: SerializedChessPiece[] = []
 
@@ -144,6 +144,8 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: numbe
     // Convert piece to a chess piece
     const chessPiece = classNamesToChessPiece(piece.className)
     if (!chessPiece) return
+
+    console.log('considrenig,', chessPiece)
 
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
       ;(piece as HTMLElement).style.opacity = '0.7'
@@ -172,7 +174,7 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: numbe
     })
   }, delayTime)
 
-  return interval
+  return { interval, hiddenPieces }
 }
 
 export const showAllPieces = () => {
