@@ -103,7 +103,6 @@ function App() {
     if (pieces === undefined) return
     if (!isActive) return
     console.log('hidePiecesHandler', pieces)
-    // const saveableHiddenPieces = new Set(Object.keys(pieces))
     setHiddenPieces(hidePieces(pieces))
   }
 
