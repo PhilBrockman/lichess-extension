@@ -92,7 +92,7 @@ function useStorageSyncState<T extends SavableTypes>(key: string, defaultValue: 
 function App() {
   // saved settings
   const [isActive, setIsActive] = useStorageSyncState<boolean>(IS_ACTIVE, false)
-  const [delayOnHide, setDelayOnHide] = useStorageSyncState<number>(DELAY_ON_HIDE, 2000)
+  const [delayOnHide, setDelayOnHide] = useStorageSyncState<number>(DELAY_ON_HIDE, 300)
   const [pieces, setPieces] = useStorageSyncState<Set<string>>(
     PREFERRED_HIDDEN_PIECES,
     allCombinationsOfChessPieces(),
@@ -104,8 +104,12 @@ function App() {
 
   // hide pieces on load
   const hidePiecesHandler = () => {
+    if (!isActive) {
+      clearInterval(hidingInterval)
+      showAllPieces()
+      return
+    }
     if (pieces === undefined) return
-    if (!isActive) return showAllPieces()
     if (hidingInterval) {
       clearInterval(hidingInterval)
     }
@@ -115,7 +119,6 @@ function App() {
   }
 
   useEffect(() => {
-    if (!isActive) return
     const obs = basicObserver({
       callback: _.debounce(
         () => {
@@ -125,6 +128,7 @@ function App() {
         { leading: true },
       ),
     })
+    hidePiecesHandler()
     return () => {
       obs?.disconnect()
     }

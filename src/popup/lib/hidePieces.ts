@@ -145,9 +145,10 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: numbe
     const chessPiece = classNamesToChessPiece(piece.className)
     if (!chessPiece) return
 
-    console.log('considrenig,', chessPiece)
-
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
+      // if opacity is 0, then the piece is hidden
+      console.log('current opacity', (piece as HTMLElement).style.opacity)
+      if ((piece as HTMLElement).style.opacity === '0') return
       ;(piece as HTMLElement).style.opacity = '0.7'
     } else {
       ;(piece as HTMLElement).style.opacity = '1'
