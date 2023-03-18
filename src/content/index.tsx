@@ -16,7 +16,6 @@ document.head.appendChild(linkElement)
 const container = document.createElement('div')
 const element = document.querySelectorAll('.puzzle__moves.areplay, .analyse__moves.areplay')
 element?.[0].appendChild(container)
-
 // const element = document.querySelector('.puzzle__board.main-board')
 // // append "flex and flex-row" to the classList
 // element?.classList.add('flex', 'flex-row')
