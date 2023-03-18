@@ -14,12 +14,17 @@ const DELAY_ON_HIDE = 'DELAY_ON_HIDE' + version
 
 function App() {
   // saved settings
-  const [isActive, setIsActive] = useStorageSyncState<boolean>(IS_ACTIVE, false)
-  const [delayOnHide, setDelayOnHide] = useStorageSyncState<number>(DELAY_ON_HIDE, 2500)
-  const [pieces, setPieces] = useStorageSyncState<Set<string>>(
+  const [isActive, setIsActive, resetActive] = useStorageSyncState<boolean>(IS_ACTIVE, false)
+  const [delayOnHide, setDelayOnHide, resetDelay] = useStorageSyncState<number>(DELAY_ON_HIDE, 2500)
+  const [pieces, setPieces, resetPieces] = useStorageSyncState<Set<string>>(
     PREFERRED_HIDDEN_PIECES,
     allCombinationsOfChessPieces(),
   )
+  const reset = () => {
+    resetActive()
+    resetDelay()
+    resetPieces()
+  }
 
   // local state
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
@@ -52,7 +57,6 @@ function App() {
   useEffect(() => {
     const obs = puzzleObserver({
       newPuzzleCallback: () => {
-        console.log('starting new puzzle')
         handleShowAllPieces()
       },
       pieceCallback: _.debounce(hidePiecesHandler, 300, { leading: true, trailing: true }),
@@ -85,12 +89,14 @@ function App() {
         setIsActive,
         delayOnHide,
         setDelayOnHide,
+        reset,
       }}
     >
-      <div className="space-y-3" style={{ zIndex: 1000 }}>
-        <div className="text-sm font-medium text-center text-gray-500 border-gray-200 py-3 ">
-          <LoadedContent />
-        </div>
+      <div
+        className="text-sm font-medium text-center text-gray-500 border-gray-200 py-3 "
+        style={{ zIndex: 1000 }}
+      >
+        <LoadedContent />
       </div>
     </AppStateContext.Provider>
   )
