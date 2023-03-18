@@ -61,9 +61,10 @@ export function HiddenPiece(piece: SerializedChessPiece) {
 
   return (
     <button
-      className="flex flex-row gap-2 items-center cursor-pointer px-2 py-1 rounded-lg border border-1 border-gray-300  bg-gray-200 flex-shrink-0 hover:bg-gray-300 transition-all hover:border-gray-400 hover:shadow-lg active:bg-gray-400 active:border-gray-500 active:scale-95 scale-100 duration-100"
+      className="flex-grow flex flex-row gap-2 items-center cursor-pointer px-2 py-1 rounded-lg border border-1 border-gray-300  bg-gray-200 flex-shrink-0 hover:bg-gray-300 transition-all hover:border-gray-400 hover:shadow-lg active:bg-gray-400 active:border-gray-500 active:scale-95 scale-100 duration-100"
       onClick={handleClick}
       onMouseLeave={handleMouseLeave}
+      style={{ maxWidth: '50%' }}
     >
       <img src={url} className="w-8 h-8" />
       <span>

@@ -1,20 +1,10 @@
+import { useContext } from 'react'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 import Settings from './Modal/Settings'
-import { SerializedChessPiece } from './lib/types'
+import { AppStateContext } from './lib/types'
 
-export function LoadedContent({
-  isActive,
-  pieces,
-  setPieces,
-  hiddenPieces,
-  setIsActive,
-}: {
-  isActive?: boolean
-  pieces?: Set<string> | undefined
-  setPieces: (pieces: Set<string>) => void
-  hiddenPieces?: SerializedChessPiece[]
-  setIsActive: (isActive: boolean) => void
-}) {
+export function LoadedContent() {
+  const { isActive, hiddenPieces, setIsActive } = useContext(AppStateContext)
   return (
     <>
       <div className="space-y-3 p-3">

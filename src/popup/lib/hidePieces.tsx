@@ -132,13 +132,15 @@ export const hidePieces = ({
   PIECES_THAT_I_CAN_HIDE,
   delayTime,
   setHiddenPieces,
+  hasStartedHiding,
 }: {
   PIECES_THAT_I_CAN_HIDE: Set<string>
   delayTime: number
   setHiddenPieces: any
+  hasStartedHiding: boolean
 }) => {
+  if (hasStartedHiding) return
   const pieces = document.querySelectorAll('piece')
-
   // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
     if (piece.className.indexOf('ghost') !== -1) return
@@ -175,6 +177,13 @@ export const hidePieces = ({
       }
     })
     setHiddenPieces(hiddenPieces)
+
+    const container = document.querySelector('.puzzle__moves.areplay')
+    if (container) {
+      setTimeout(() => {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+      }, 150)
+    }
   }
 
   // Set a timer to hide the pieces
