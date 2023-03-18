@@ -28,29 +28,24 @@ function App() {
 
   // local state
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
-  const [hidingInterval, setHidingInterval] = useState<number | undefined>()
+  // const [hidingInterval, setHidingInterval] = useState<number | undefined>()
   const handleShowAllPieces = () => {
     showAllPieces()
     setHiddenPieces([])
   }
-  const clearCurrentInterval = () => {
-    clearInterval(hidingInterval)
-    setHidingInterval(undefined)
-  }
-  const hidePieces = useHidePieces({
+  const { hidePieces } = useHidePieces({
     PIECES_THAT_I_CAN_HIDE: pieces,
     setHiddenPieces,
-    clearCurrentInterval,
-    setHidingInterval,
+    delayTime: delayOnHide,
+    isActive,
   })
 
   // hide pieces on load
   const hidePiecesHandler = useCallback(() => {
     if (!isActive) return handleShowAllPieces()
     if (pieces === undefined) return
-
-    hidePieces(delayOnHide)
-  }, [delayOnHide, hidingInterval, isActive, pieces])
+    hidePieces()
+  }, [delayOnHide, isActive, pieces])
 
   useEffect(() => {
     const obs = puzzleObserver({
@@ -64,12 +59,12 @@ function App() {
     }
   }, [hidePiecesHandler])
 
-  useEffect(() => {
-    handleShowAllPieces()
-    if (isActive) {
-      hidePiecesHandler()
-    }
-  }, [isActive, pieces])
+  // useEffect(() => {
+  //   handleShowAllPieces()
+  //   if (isActive) {
+  //     hidePiecesHandler()
+  //   }
+  // }, [isActive, pieces])
 
   return (
     <AppStateContext.Provider

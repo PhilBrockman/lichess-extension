@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { stringifyChessPieceIdentifier } from './helpers'
 import { ChessPiece, CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, SerializedChessPiece } from './types'
 
@@ -132,14 +132,21 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
 export const useHidePieces = ({
   PIECES_THAT_I_CAN_HIDE,
   setHiddenPieces,
-  clearCurrentInterval,
-  setHidingInterval,
+  delayTime,
+  isActive,
 }: {
   PIECES_THAT_I_CAN_HIDE: Set<string>
   setHiddenPieces: any
-  clearCurrentInterval: () => void
-  setHidingInterval: (interval: number) => void
+  delayTime: number
+  isActive: boolean
 }) => {
+  const [triggerEffect, setTriggerEffect] = useState(false)
+  const triggerRef = useRef(false)
+
+  useEffect(() => {
+    triggerRef.current = triggerEffect
+  }, [triggerEffect])
+
   const pieces = document.querySelectorAll('piece')
   // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
@@ -151,6 +158,10 @@ export const useHidePieces = ({
 
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
       // if opacity is 0, then the piece is hidden
+      if (!isActive) {
+        ;(piece as HTMLElement).style.opacity = '1'
+        return
+      }
       if ((piece as HTMLElement).style.opacity === '0') return
       ;(piece as HTMLElement).style.opacity = '0.4'
     } else {
@@ -186,17 +197,18 @@ export const useHidePieces = ({
     }
   }, [pieces])
 
-  return (delayTime?: number) => {
-    if (delayTime) {
-      clearCurrentInterval()
-      setHidingInterval(
-        window.setTimeout(() => {
-          handleTimeout()
-        }, delayTime),
-      )
-    } else {
-      handleTimeout()
+  useEffect(() => {
+    if (triggerRef.current && isActive) {
+      const intervalId = setInterval(() => {
+        handleTimeout()
+      }, delayTime)
+
+      return () => clearInterval(intervalId)
     }
+  }, [triggerRef, handleTimeout, delayTime, isActive])
+
+  return {
+    hidePieces: () => setTriggerEffect(true),
   }
 }
 
