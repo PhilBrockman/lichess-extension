@@ -2,7 +2,6 @@ import { CHESS_PIECE_COLORS, SerializedChessPiece } from '../lib/types'
 import { HiddenPiece } from './HiddenPiece'
 
 export function HiddenPieces({ pieces }: { pieces: SerializedChessPiece[] }) {
-  console.log('hiding pieces', pieces)
   return (
     <div className="flex flex-row flex-wrap gap-2">
       {[CHESS_PIECE_COLORS.WHITE, CHESS_PIECE_COLORS.BLACK].map((color) => {

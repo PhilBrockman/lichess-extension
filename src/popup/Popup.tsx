@@ -7,7 +7,7 @@ import { useStorageSyncState } from './lib/useStorageSyncState'
 import { LoadedContent } from './LoadedContent'
 import { useEffect, useState } from 'react'
 
-const version = '_V4'
+const version = '_V5'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR' + version
 const IS_ACTIVE = 'IS_ACTIVE' + version
 const DELAY_ON_HIDE = 'DELAY_ON_HIDE' + version
@@ -15,7 +15,7 @@ const DELAY_ON_HIDE = 'DELAY_ON_HIDE' + version
 function App() {
   // saved settings
   const [isActive, setIsActive] = useStorageSyncState<boolean>(IS_ACTIVE, false)
-  const [delayOnHide, setDelayOnHide] = useStorageSyncState<number>(DELAY_ON_HIDE, 300)
+  const [delayOnHide, setDelayOnHide] = useStorageSyncState<number>(DELAY_ON_HIDE, 1200)
   const [pieces, setPieces] = useStorageSyncState<Set<string>>(
     PREFERRED_HIDDEN_PIECES,
     allCombinationsOfChessPieces(),
@@ -36,15 +36,14 @@ function App() {
     if (hidingInterval) {
       clearInterval(hidingInterval)
     }
-    console.count('hidePiecesHandler')
-    const { interval, hiddenPieces } = hidePieces(pieces, delayOnHide)
-    console.log({
-      pieces,
-      isActive,
-      hiddenPieces,
+
+    const { interval } = hidePieces({
+      PIECES_THAT_I_CAN_HIDE: pieces,
+      delayTime: delayOnHide,
+      setHiddenPieces,
     })
+
     setHidingInterval(interval)
-    setHiddenPieces(hiddenPieces)
   }
 
   useEffect(() => {

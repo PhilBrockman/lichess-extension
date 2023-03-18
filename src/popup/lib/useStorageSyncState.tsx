@@ -26,7 +26,6 @@ export function useStorageSyncState<T extends SavableTypes>(key: string, default
 
   useEffect(() => {
     chrome.storage.sync.get([key], (result) => {
-      console.log('useStorageSyncState', key, result)
       if (result[key] !== undefined) {
         setState(parse(result[key]))
       } else {
