@@ -1,5 +1,5 @@
 import { allCombinationsOfChessPieces } from './lib/helpers'
-import { hidePieces, showAllPieces } from './lib/hidePieces'
+import { useHidePieces, showAllPieces } from './lib/hidePieces'
 import _ from 'lodash'
 import { puzzleObserver } from './lib/basicObserver'
 import { AppStateContext, SerializedChessPiece } from './lib/types'
@@ -29,29 +29,30 @@ function App() {
   // local state
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
   const [hidingInterval, setHidingInterval] = useState<number | undefined>()
-
   const handleShowAllPieces = () => {
     showAllPieces()
     setHiddenPieces([])
+  }
+  const clearCurrentInterval = () => {
     clearInterval(hidingInterval)
     setHidingInterval(undefined)
   }
+  const hidePieces = useHidePieces({
+    PIECES_THAT_I_CAN_HIDE: pieces,
+    setHiddenPieces,
+    clearCurrentInterval,
+    setHidingInterval,
+  })
+
+  useEffect(() => {
+    console.log('hidingInterval', hidingInterval)
+  }, [hidingInterval])
 
   // hide pieces on load
   const hidePiecesHandler = useCallback(() => {
-    if (!isActive) {
-      clearInterval(hidingInterval)
-      handleShowAllPieces()
-      return
-    }
+    if (!isActive) return handleShowAllPieces()
     if (pieces === undefined) return
-    const result = hidePieces({
-      PIECES_THAT_I_CAN_HIDE: pieces,
-      delayTime: delayOnHide,
-      setHiddenPieces,
-      hasStartedHiding: Boolean(hidingInterval),
-    })
-    result && setHidingInterval(result.interval)
+    hidePieces(delayOnHide)
   }, [delayOnHide, hidingInterval, isActive, pieces])
 
   useEffect(() => {
