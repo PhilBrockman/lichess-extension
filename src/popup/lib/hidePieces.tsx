@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from 'react'
 import { stringifyChessPieceIdentifier } from './helpers'
 import { ChessPiece, CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, SerializedChessPiece } from './types'
 
@@ -128,18 +129,17 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
   }
 }
 
-export const hidePieces = ({
+export const useHidePieces = ({
   PIECES_THAT_I_CAN_HIDE,
-  delayTime,
   setHiddenPieces,
-  hasStartedHiding,
+  clearCurrentInterval,
+  setHidingInterval,
 }: {
   PIECES_THAT_I_CAN_HIDE: Set<string>
-  delayTime: number
   setHiddenPieces: any
-  hasStartedHiding: boolean
+  clearCurrentInterval: () => void
+  setHidingInterval: (interval: number) => void
 }) => {
-  if (hasStartedHiding) return
   const pieces = document.querySelectorAll('piece')
   // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
@@ -152,13 +152,13 @@ export const hidePieces = ({
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
       // if opacity is 0, then the piece is hidden
       if ((piece as HTMLElement).style.opacity === '0') return
-      ;(piece as HTMLElement).style.opacity = '0.7'
+      ;(piece as HTMLElement).style.opacity = '0.4'
     } else {
       ;(piece as HTMLElement).style.opacity = '1'
     }
   })
 
-  const hidePieces = () => {
+  const handleTimeout = useCallback(() => {
     const hiddenPieces: SerializedChessPiece[] = []
     pieces.forEach((piece) => {
       if (piece.className.indexOf('ghost') !== -1) return
@@ -184,12 +184,20 @@ export const hidePieces = ({
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
       }, 150)
     }
+  }, [pieces])
+
+  return (delayTime?: number) => {
+    if (delayTime) {
+      clearCurrentInterval()
+      setHidingInterval(
+        window.setTimeout(() => {
+          handleTimeout()
+        }, delayTime),
+      )
+    } else {
+      handleTimeout()
+    }
   }
-
-  // Set a timer to hide the pieces
-  const interval = window.setTimeout(hidePieces, delayTime)
-
-  return { interval }
 }
 
 export const showAllPieces = () => {

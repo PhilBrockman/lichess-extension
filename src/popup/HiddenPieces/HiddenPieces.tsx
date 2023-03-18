@@ -6,7 +6,7 @@ export function HiddenPieces({ pieces }: { pieces: SerializedChessPiece[] }) {
     <div className="grid grid-cols-2 gap-4">
       {[CHESS_PIECE_COLORS.WHITE, CHESS_PIECE_COLORS.BLACK].map((color) => {
         return (
-          <div className="w-full flex flex-row flex-wrap gap-2" key={color}>
+          <div className="grid grid-cols-2 gap-2" key={color}>
             {pieces
               .filter((piece) => piece.color === color)
               .sort((a, b) => {

@@ -15,7 +15,7 @@ export const AppStateContext = createContext<{
   hiddenPieces: [],
   isActive: false,
   setIsActive: () => {},
-  delayOnHide: 300,
+  delayOnHide: 2500,
   setDelayOnHide: () => {},
   reset: () => {},
 })

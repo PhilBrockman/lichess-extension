@@ -296,7 +296,7 @@ const Reset = () => {
         <p className="text-gray-300 hover:text-gray-500 hover:border-2 hover:border-gray-300 hover:bg-gray-100 rounded-md p-2">
           Choose how long to delay hiding the pieces (in seconds):
         </p>
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center justify-between">
           <label htmlFor="delay-on-hide">{delayOnHide / 1000}</label>
           <input
             type="range"

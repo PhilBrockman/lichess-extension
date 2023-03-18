@@ -13,7 +13,6 @@ export function puzzleObserver({
           if ((node as any).tagName === 'PIECE') {
             pieceCallback(mutation.target)
           }
-          // console.log('checknig node', node)
           if (node instanceof HTMLElement && node.matches('div.puzzle__feedback.play')) {
             newPuzzleCallback()
           }
