@@ -1,12 +1,5 @@
 import { stringifyChessPieceIdentifier } from './helpers'
-import {
-  ChessPiece,
-  CHESS_PIECE_COLORS,
-  CHESS_PIECE_NAMES,
-  SerializedChessPiece,
-  chessPieceColors,
-  chessPieceNames,
-} from './types'
+import { ChessPiece, CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, SerializedChessPiece } from './types'
 
 function getBoardOrientation(): CHESS_PIECE_COLORS {
   const boardParent = document.querySelector('cg-container')?.parentElement
@@ -114,11 +107,13 @@ function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undef
 
   // Return an object with the rank and file of the piece
   const [color, pieceName] = piece.className.split(' ')
+  if (Object.values(CHESS_PIECE_COLORS).indexOf(color as any) === -1) return undefined
+  if (Object.values(CHESS_PIECE_NAMES).indexOf(pieceName as any) === -1) return undefined
   return {
     row: rank,
     column: String.fromCharCode(96 + file),
-    color,
-    pieceName,
+    color: color as CHESS_PIECE_COLORS,
+    pieceName: pieceName as CHESS_PIECE_NAMES,
     originalPosition: piece,
   }
 }
@@ -133,10 +128,19 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
   }
 }
 
-export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: number) => {
+export const hidePieces = ({
+  PIECES_THAT_I_CAN_HIDE,
+  delayTime,
+  setHiddenPieces,
+  hasStartedHiding,
+}: {
+  PIECES_THAT_I_CAN_HIDE: Set<string>
+  delayTime: number
+  setHiddenPieces: any
+  hasStartedHiding: boolean
+}) => {
+  if (hasStartedHiding) return
   const pieces = document.querySelectorAll('piece')
-  const hiddenPieces: SerializedChessPiece[] = []
-
   // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
     if (piece.className.indexOf('ghost') !== -1) return
@@ -147,7 +151,6 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: numbe
 
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
       // if opacity is 0, then the piece is hidden
-      console.log('current opacity', (piece as HTMLElement).style.opacity)
       if ((piece as HTMLElement).style.opacity === '0') return
       ;(piece as HTMLElement).style.opacity = '0.7'
     } else {
@@ -155,8 +158,8 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: numbe
     }
   })
 
-  // Set a timer to hide the pieces
-  const interval = window.setTimeout(() => {
+  const hidePieces = () => {
+    const hiddenPieces: SerializedChessPiece[] = []
     pieces.forEach((piece) => {
       if (piece.className.indexOf('ghost') !== -1) return
 
@@ -173,9 +176,20 @@ export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: numbe
         ;(piece as HTMLElement).style.opacity = '1'
       }
     })
-  }, delayTime)
+    setHiddenPieces(hiddenPieces)
 
-  return { interval, hiddenPieces }
+    const container = document.querySelector('.puzzle__moves.areplay')
+    if (container) {
+      setTimeout(() => {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+      }, 150)
+    }
+  }
+
+  // Set a timer to hide the pieces
+  const interval = window.setTimeout(hidePieces, delayTime)
+
+  return { interval }
 }
 
 export const showAllPieces = () => {

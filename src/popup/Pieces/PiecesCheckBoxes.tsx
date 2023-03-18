@@ -239,19 +239,17 @@ export default function PiecesCheckBoxes({
                 </div>
               </div>
             </div>
-            {Object.keys(CHESS_PIECE_NAMES).map((n) => {
+            {Object.values(CHESS_PIECE_NAMES).map((n) => {
               const name = n as CHESS_PIECE_NAMES
               return (
                 <div key={name} className="flex flex-row gap-1">
                   <div className="w-1/3">{name}</div>
-                  {[CHESS_PIECE_COLORS.WHITE, CHESS_PIECE_COLORS.BLACK].map((c) => {
-                    const color = c as CHESS_PIECE_COLORS
-
+                  {[CHESS_PIECE_COLORS.WHITE, CHESS_PIECE_COLORS.BLACK].map((color) => {
                     return (
                       <div key={`${name}-${color}`} className="w-1/3">
                         <PieceCheckBox
                           name={name as CHESS_PIECE_NAMES}
-                          color={color as CHESS_PIECE_COLORS}
+                          color={color}
                           isChecked={
                             !checkedPieces?.has(stringifyChessPieceIdentifier({ name, color }))
                           }
