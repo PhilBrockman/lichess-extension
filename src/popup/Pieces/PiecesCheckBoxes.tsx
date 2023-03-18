@@ -1,15 +1,7 @@
 import { useEffect, useState } from 'react'
 import PieceCheckBox from './PieceCheckBox'
 import * as Tabs from '@radix-ui/react-tabs'
-import {
-  CHESS_PIECE_COLORS,
-  CHESS_PIECE_COLORS,
-  CHESS_PIECE_NAMES,
-  chessPieceColors,
-  chessPieceNames,
-  parseChessPieceIdentifier,
-  stringifyChessPieceIdentifier,
-} from '../types'
+import { CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, stringifyChessPieceIdentifier } from '../types'
 import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
 
 const ALL_HIDDEN = {
@@ -81,7 +73,7 @@ const Preset = ({
     'cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border-gray-300'
 
   const invertedPiecRow = (color: CHESS_PIECE_COLORS) =>
-    Object.keys(chessPieceNames).map((n) => {
+    Object.keys(CHESS_PIECE_NAMES).map((n) => {
       const name = n as CHESS_PIECE_NAMES
       const piece = stringifyChessPieceIdentifier({ color, name })
       if (preset.data.has(piece)) return null
@@ -284,12 +276,12 @@ export default function PiecesCheckBoxes({
                 </div>
               </div>
             </div>
-            {Object.keys(chessPieceNames).map((n) => {
+            {Object.keys(CHESS_PIECE_NAMES).map((n) => {
               const name = n as CHESS_PIECE_NAMES
               return (
                 <div key={name} className="flex flex-row gap-1">
                   <div className="w-1/3">{name}</div>
-                  {Object.keys(chessPieceColors).map((c) => {
+                  {[CHESS_PIECE_COLORS.WHITE, CHESS_PIECE_COLORS.BLACK].map((c) => {
                     const color = c as CHESS_PIECE_COLORS
 
                     return (

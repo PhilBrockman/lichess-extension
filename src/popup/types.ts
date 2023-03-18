@@ -1,14 +1,5 @@
 export type SavableTypes = Set<string> | object | number | string | boolean
 
-export const chessPieceNames = {
-  pawn: true,
-  knight: true,
-  bishop: true,
-  rook: true,
-  queen: true,
-  king: true,
-} as const
-
 export enum CHESS_PIECE_COLORS {
   WHITE = 'white',
   BLACK = 'black',
@@ -23,18 +14,13 @@ export enum CHESS_PIECE_NAMES {
   KING = 'king',
 }
 
-export const chessPieceColors = {
-  [CHESS_PIECE_COLORS.WHITE]: true,
-  [CHESS_PIECE_COLORS.BLACK]: true,
-} as const
-
 export const allCombinationsOfChessPieces = () => {
   const allCombinations: ChessPiece[] = []
-  for (const pieceName of Object.keys(chessPieceNames)) {
-    for (const pieceColor of Object.keys(chessPieceColors)) {
+  for (const pieceName of Object.values(CHESS_PIECE_NAMES)) {
+    for (const pieceColor of Object.values(CHESS_PIECE_COLORS)) {
       allCombinations.push({
-        name: pieceName as CHESS_PIECE_NAMES,
-        color: pieceColor as CHESS_PIECE_COLORS,
+        name: pieceName,
+        color: pieceColor,
       })
     }
   }
@@ -55,11 +41,11 @@ export type ChessPiece = {
 }
 
 export const isValidColor = (color: string): color is CHESS_PIECE_COLORS => {
-  return chessPieceColors[color as CHESS_PIECE_COLORS] !== undefined
+  return Object.values(CHESS_PIECE_COLORS).includes(color as CHESS_PIECE_COLORS)
 }
 
 export const isValidName = (name: string): name is CHESS_PIECE_NAMES => {
-  return chessPieceNames[name as CHESS_PIECE_NAMES] !== undefined
+  return Object.values(CHESS_PIECE_NAMES).includes(name as CHESS_PIECE_NAMES)
 }
 
 export const stringifyChessPieceIdentifier = (piece: ChessPiece) => {
