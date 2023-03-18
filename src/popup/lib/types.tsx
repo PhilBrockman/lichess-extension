@@ -1,3 +1,23 @@
+import { createContext } from 'react'
+
+export const AppStateContext = createContext<{
+  pieces: Set<string>
+  setPieces: (pieces: Set<string>) => void
+  hiddenPieces?: SerializedChessPiece[]
+  isActive: boolean
+  setIsActive: (isActive: boolean) => void
+  delayOnHide: number
+  setDelayOnHide: (delayOnHide: number) => void
+}>({
+  pieces: new Set(),
+  setPieces: () => {},
+  hiddenPieces: [],
+  isActive: false,
+  setIsActive: () => {},
+  delayOnHide: 300,
+  setDelayOnHide: () => {},
+})
+
 export type SavableTypes = Set<string> | object | number | string | boolean
 
 export const chessPieceNames = {

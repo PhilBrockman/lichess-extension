@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import PiecesCheckBoxes from '../Pieces/PiecesCheckBoxes'
 import { useContext } from 'react'
-import { AppStateContext } from '../Popup'
+import { AppStateContext } from '../lib/types'
 
 const Settings = () => {
   const { pieces, setPieces } = useContext(AppStateContext)

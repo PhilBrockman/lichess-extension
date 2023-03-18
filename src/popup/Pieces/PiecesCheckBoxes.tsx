@@ -1,15 +1,9 @@
 import { useEffect, useState } from 'react'
 import PieceCheckBox from './PieceCheckBox'
 import * as Tabs from '@radix-ui/react-tabs'
-import {
-  ChessPieceColor,
-  ChessPieceName,
-  chessPieceColors,
-  chessPieceNames,
-  parseChessPieceIdentifier,
-  stringifyChessPieceIdentifier,
-} from '../lib/types'
+import { ChessPieceColor, ChessPieceName, chessPieceColors, chessPieceNames } from '../lib/types'
 import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
+import { stringifyChessPieceIdentifier } from '../lib/helpers'
 
 const ALL_HIDDEN = {
   label: 'Pieceless Puzzles',
