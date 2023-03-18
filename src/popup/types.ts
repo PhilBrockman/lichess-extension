@@ -9,9 +9,14 @@ export const chessPieceNames = {
   king: true,
 } as const
 
+export enum CHESS_PIECE_COLORS {
+  WHITE = 'white',
+  BLACK = 'black',
+}
+
 export const chessPieceColors = {
-  white: true,
-  black: true,
+  [CHESS_PIECE_COLORS.WHITE]: true,
+  [CHESS_PIECE_COLORS.BLACK]: true,
 } as const
 
 export const allCombinationsOfChessPieces = () => {
@@ -20,7 +25,7 @@ export const allCombinationsOfChessPieces = () => {
     for (const pieceColor of Object.keys(chessPieceColors)) {
       allCombinations.push({
         name: pieceName as ChessPieceName,
-        color: pieceColor as ChessPieceColor,
+        color: pieceColor as CHESS_PIECE_COLORS,
       })
     }
   }
@@ -28,7 +33,6 @@ export const allCombinationsOfChessPieces = () => {
 }
 
 export type ChessPieceName = keyof typeof chessPieceNames
-export type ChessPieceColor = keyof typeof chessPieceColors
 
 export type SerializedChessPiece = {
   row: number
@@ -40,11 +44,11 @@ export type SerializedChessPiece = {
 
 export type ChessPiece = {
   name: ChessPieceName
-  color: ChessPieceColor
+  color: CHESS_PIECE_COLORS
 }
 
-export const isValidColor = (color: string): color is ChessPieceColor => {
-  return chessPieceColors[color as ChessPieceColor] !== undefined
+export const isValidColor = (color: string): color is CHESS_PIECE_COLORS => {
+  return chessPieceColors[color as CHESS_PIECE_COLORS] !== undefined
 }
 
 export const isValidName = (name: string): name is ChessPieceName => {
@@ -56,7 +60,7 @@ export const stringifyChessPieceIdentifier = (piece: ChessPiece) => {
 }
 
 export const parseChessPieceIdentifier = (piece: string): ChessPiece => {
-  const [color, name] = piece.split('_') as [ChessPieceColor, ChessPieceName]
+  const [color, name] = piece.split('_') as [CHESS_PIECE_COLORS, ChessPieceName]
   return {
     color,
     name,

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import PieceCheckBox from './PieceCheckBox'
 import * as Tabs from '@radix-ui/react-tabs'
 import {
-  ChessPieceColor,
+  CHESS_PIECE_COLORS,
+  CHESS_PIECE_COLORS,
   ChessPieceName,
   chessPieceColors,
   chessPieceNames,
@@ -79,7 +80,7 @@ const Preset = ({
   const inactiveClasses =
     'cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 border-gray-300'
 
-  const invertedPiecRow = (color: ChessPieceColor) =>
+  const invertedPiecRow = (color: CHESS_PIECE_COLORS) =>
     Object.keys(chessPieceNames).map((n) => {
       const name = n as ChessPieceName
       const piece = stringifyChessPieceIdentifier({ color, name })
@@ -123,8 +124,12 @@ const Preset = ({
         )}
         <div className="text-center text-xl">{preset.label}</div>
         <div>
-          <div className="flex flex-row gap-1 justify-between">{invertedPiecRow('white')}</div>
-          <div className="flex flex-row gap-1 justify-between">{invertedPiecRow('black')}</div>
+          <div className="flex flex-row gap-1 justify-between">
+            {invertedPiecRow(CHESS_PIECE_COLORS.WHITE)}
+          </div>
+          <div className="flex flex-row gap-1 justify-between">
+            {invertedPiecRow(CHESS_PIECE_COLORS.BLACK)}
+          </div>
         </div>
         <p className="text-md text-gray-500 group-hover:text-gray-700">{preset.helper}</p>
       </div>
@@ -285,13 +290,13 @@ export default function PiecesCheckBoxes({
                 <div key={name} className="flex flex-row gap-1">
                   <div className="w-1/3">{name}</div>
                   {Object.keys(chessPieceColors).map((c) => {
-                    const color = c as ChessPieceColor
+                    const color = c as CHESS_PIECE_COLORS
 
                     return (
                       <div key={`${name}-${color}`} className="w-1/3">
                         <PieceCheckBox
                           name={name as ChessPieceName}
-                          color={color as ChessPieceColor}
+                          color={color as CHESS_PIECE_COLORS}
                           isChecked={
                             !checkedPieces?.has(stringifyChessPieceIdentifier({ name, color }))
                           }
