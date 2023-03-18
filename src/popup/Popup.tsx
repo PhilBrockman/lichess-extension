@@ -52,7 +52,7 @@ function App() {
       newPuzzleCallback: () => {
         handleShowAllPieces()
       },
-      pieceCallback: _.debounce(hidePiecesHandler, 300, { leading: true, trailing: true }),
+      pieceCallback: _.debounce(hidePiecesHandler, 100, { leading: true, trailing: true }),
     })
     return () => {
       obs?.disconnect()

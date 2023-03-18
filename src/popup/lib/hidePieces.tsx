@@ -148,6 +148,7 @@ export const useHidePieces = ({
   }, [triggerEffect])
 
   const pieces = document.querySelectorAll('piece')
+  const hiddenPieces: SerializedChessPiece[] = []
   // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
     if (piece.className.indexOf('ghost') !== -1) return
@@ -157,6 +158,7 @@ export const useHidePieces = ({
     if (!chessPiece) return
 
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
+      hiddenPieces.push(getChessPieceLocation(piece as HTMLElement) as SerializedChessPiece)
       // if opacity is 0, then the piece is hidden
       if (!isActive) {
         ;(piece as HTMLElement).style.opacity = '1'
@@ -168,26 +170,21 @@ export const useHidePieces = ({
       ;(piece as HTMLElement).style.opacity = '1'
     }
   })
+  setHiddenPieces(hiddenPieces)
 
   const handleTimeout = useCallback(() => {
-    const hiddenPieces: SerializedChessPiece[] = []
     pieces.forEach((piece) => {
       if (piece.className.indexOf('ghost') !== -1) return
-
       // Convert piece to a chess piece
       const chessPiece = classNamesToChessPiece(piece.className)
       if (!chessPiece) return
-
       if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
         // Hide the piece
         ;(piece as HTMLElement).style.opacity = '0'
-        const loc = getChessPieceLocation(piece as HTMLElement)
-        if (loc) hiddenPieces.push(loc)
       } else {
         ;(piece as HTMLElement).style.opacity = '1'
       }
     })
-    setHiddenPieces(hiddenPieces)
 
     const container = document.querySelector('.puzzle__moves.areplay')
     if (container) {
@@ -199,8 +196,10 @@ export const useHidePieces = ({
 
   useEffect(() => {
     if (triggerRef.current && isActive) {
+      // updateHiddenPieces()
       const intervalId = setInterval(() => {
         handleTimeout()
+        // updateHiddenPieces()
       }, delayTime)
 
       return () => clearInterval(intervalId)
