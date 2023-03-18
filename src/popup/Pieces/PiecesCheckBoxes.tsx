@@ -288,6 +288,7 @@ export default function PiecesCheckBoxes({
               type="range"
               min="0"
               max="10"
+              step={0.1}
               value={delayOnHide / 1000}
               onChange={(e) => setDelayOnHide(e.target.valueAsNumber * 1000)}
             />

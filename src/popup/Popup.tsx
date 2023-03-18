@@ -52,7 +52,6 @@ function App() {
   useEffect(() => {
     const obs = puzzleObserver({
       newPuzzleCallback: () => {
-        console.log('starting new puzzle')
         handleShowAllPieces()
       },
       pieceCallback: _.debounce(hidePiecesHandler, 300, { leading: true, trailing: true }),

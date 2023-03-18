@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { SavableTypes } from './types'
+import { debounce } from 'lodash'
 
 function savingOperations<T extends SavableTypes>(defaultValue: T) {
   if (defaultValue instanceof Set) {
@@ -34,10 +35,13 @@ export function useStorageSyncState<T extends SavableTypes>(key: string, default
     })
   }, [])
 
+  const debouncedWriteToStorage = debounce((value: T) => {
+    chrome.storage.sync.set({ [key]: stringify(value) }, () => {})
+  }, 300)
+
   const setStorageState = (value: T) => {
-    chrome.storage.sync.set({ [key]: stringify(value) }, () => {
-      setState(value)
-    })
+    setState(value)
+    debouncedWriteToStorage(value)
   }
 
   return [state ?? defaultValue, setStorageState] as const
