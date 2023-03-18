@@ -93,7 +93,7 @@ function getTransformDirections(transform: string) {
   return [parseInt(x), parseInt(y)]
 }
 
-function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undefined {
+export function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undefined {
   // Get the width and height of the chessboard
   const { width, height } = getChessBoardDimensions()
 
@@ -119,7 +119,7 @@ function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undef
   }
 }
 
-const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
+export const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
   const [color, pieceName] = classNames.split(' ') as [CHESS_PIECE_COLORS, CHESS_PIECE_NAMES]
   if (Object.values(CHESS_PIECE_COLORS).indexOf(color) === -1) return undefined
   if (Object.values(CHESS_PIECE_NAMES).indexOf(pieceName) === -1) return undefined
@@ -131,12 +131,10 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
 
 export const useHidePieces = ({
   PIECES_THAT_I_CAN_HIDE,
-  setHiddenPieces,
   delayTime,
   isActive,
 }: {
   PIECES_THAT_I_CAN_HIDE: Set<string>
-  setHiddenPieces: any
   delayTime: number
   isActive: boolean
 }) => {
@@ -148,7 +146,6 @@ export const useHidePieces = ({
   }, [triggerEffect])
 
   const pieces = document.querySelectorAll('piece')
-  const hiddenPieces: SerializedChessPiece[] = []
   // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
     if (piece.className.indexOf('ghost') !== -1) return
@@ -158,7 +155,6 @@ export const useHidePieces = ({
     if (!chessPiece) return
 
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
-      hiddenPieces.push(getChessPieceLocation(piece as HTMLElement) as SerializedChessPiece)
       // if opacity is 0, then the piece is hidden
       if (!isActive) {
         ;(piece as HTMLElement).style.opacity = '1'
@@ -170,7 +166,6 @@ export const useHidePieces = ({
       ;(piece as HTMLElement).style.opacity = '1'
     }
   })
-  setHiddenPieces(hiddenPieces)
 
   const handleTimeout = useCallback(() => {
     pieces.forEach((piece) => {
@@ -196,10 +191,8 @@ export const useHidePieces = ({
 
   useEffect(() => {
     if (triggerRef.current && isActive) {
-      // updateHiddenPieces()
       const intervalId = setInterval(() => {
         handleTimeout()
-        // updateHiddenPieces()
       }, delayTime)
 
       return () => clearInterval(intervalId)

@@ -1,5 +1,10 @@
-import { allCombinationsOfChessPieces } from './lib/helpers'
-import { useHidePieces, showAllPieces } from './lib/hidePieces'
+import { allCombinationsOfChessPieces, stringifyChessPieceIdentifier } from './lib/helpers'
+import {
+  useHidePieces,
+  showAllPieces,
+  classNamesToChessPiece,
+  getChessPieceLocation,
+} from './lib/hidePieces'
 import _ from 'lodash'
 import { puzzleObserver } from './lib/basicObserver'
 import { AppStateContext, SerializedChessPiece } from './lib/types'
@@ -28,14 +33,12 @@ function App() {
 
   // local state
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
-  // const [hidingInterval, setHidingInterval] = useState<number | undefined>()
   const handleShowAllPieces = () => {
     showAllPieces()
     setHiddenPieces([])
   }
   const { hidePieces } = useHidePieces({
     PIECES_THAT_I_CAN_HIDE: pieces,
-    setHiddenPieces,
     delayTime: delayOnHide,
     isActive,
   })
@@ -44,6 +47,26 @@ function App() {
   const hidePiecesHandler = useCallback(() => {
     if (!isActive) return handleShowAllPieces()
     if (pieces === undefined) return
+    const pieceElements = document.querySelectorAll('piece')
+    const newHiddenPieces = Array.from(pieceElements)
+      .map((piece) => {
+        const chessPiece = classNamesToChessPiece(piece.className)
+        if (!chessPiece) {
+          return {
+            chessPiece: undefined,
+            piece: undefined,
+          }
+        }
+        return { chessPiece, piece }
+      })
+      .filter(
+        ({ chessPiece }) => chessPiece && pieces.has(stringifyChessPieceIdentifier(chessPiece)),
+      )
+      .map(
+        ({ piece }) => piece && getChessPieceLocation(piece as HTMLElement),
+      ) as SerializedChessPiece[]
+
+    setHiddenPieces(newHiddenPieces)
     hidePieces()
   }, [delayOnHide, isActive, pieces])
 
@@ -59,12 +82,12 @@ function App() {
     }
   }, [hidePiecesHandler])
 
-  // useEffect(() => {
-  //   handleShowAllPieces()
-  //   if (isActive) {
-  //     hidePiecesHandler()
-  //   }
-  // }, [isActive, pieces])
+  useEffect(() => {
+    handleShowAllPieces()
+    if (isActive) {
+      hidePiecesHandler()
+    }
+  }, [isActive, pieces])
 
   return (
     <AppStateContext.Provider
