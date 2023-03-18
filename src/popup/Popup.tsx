@@ -36,7 +36,13 @@ function App() {
     if (hidingInterval) {
       clearInterval(hidingInterval)
     }
+    console.count('hidePiecesHandler')
     const { interval, hiddenPieces } = hidePieces(pieces, delayOnHide)
+    console.log({
+      pieces,
+      isActive,
+      hiddenPieces,
+    })
     setHidingInterval(interval)
     setHiddenPieces(hiddenPieces)
   }

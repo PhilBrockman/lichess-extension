@@ -18,20 +18,6 @@ export const AppStateContext = createContext<{
   setDelayOnHide: () => {},
 })
 
-export const chessPieceNames = {
-  pawn: true,
-  knight: true,
-  bishop: true,
-  rook: true,
-  queen: true,
-  king: true,
-} as const
-
-export const chessPieceColors = {
-  white: true,
-  black: true,
-} as const
-
 export type ChessPieceLocation = ChessPiece & {
   originalPosition: HTMLElement
 }
@@ -54,8 +40,8 @@ export enum CHESS_PIECE_NAMES {
 export type SerializedChessPiece = {
   row: number
   column: string
-  color: string
-  pieceName: string
+  color: CHESS_PIECE_COLORS | 'ghost'
+  pieceName: CHESS_PIECE_NAMES
   originalPosition: any
 }
 

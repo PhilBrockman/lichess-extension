@@ -30,6 +30,7 @@ export const urlFromPiece = (piece: ChessPiece) => {
 }
 
 export function HiddenPiece(piece: SerializedChessPiece) {
+  console.log('piece', piece)
   const color = piece.color
   if (color === 'ghost') {
     return null

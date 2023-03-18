@@ -1,12 +1,5 @@
 import { stringifyChessPieceIdentifier } from './helpers'
-import {
-  ChessPiece,
-  CHESS_PIECE_COLORS,
-  CHESS_PIECE_NAMES,
-  SerializedChessPiece,
-  chessPieceColors,
-  chessPieceNames,
-} from './types'
+import { ChessPiece, CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, SerializedChessPiece } from './types'
 
 function getBoardOrientation(): CHESS_PIECE_COLORS {
   const boardParent = document.querySelector('cg-container')?.parentElement
@@ -114,11 +107,13 @@ function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undef
 
   // Return an object with the rank and file of the piece
   const [color, pieceName] = piece.className.split(' ')
+  if (Object.values(CHESS_PIECE_COLORS).indexOf(color as any) === -1) return undefined
+  if (Object.values(CHESS_PIECE_NAMES).indexOf(pieceName as any) === -1) return undefined
   return {
     row: rank,
     column: String.fromCharCode(96 + file),
-    color,
-    pieceName,
+    color: color as CHESS_PIECE_COLORS,
+    pieceName: pieceName as CHESS_PIECE_NAMES,
     originalPosition: piece,
   }
 }
@@ -134,6 +129,7 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
 }
 
 export const hidePieces = (PIECES_THAT_I_CAN_HIDE: Set<string>, delayTime: number) => {
+  console.log("Hiding pieces that I can't see", PIECES_THAT_I_CAN_HIDE)
   const pieces = document.querySelectorAll('piece')
   const hiddenPieces: SerializedChessPiece[] = []
 
