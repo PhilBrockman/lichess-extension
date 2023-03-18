@@ -40,6 +40,7 @@ const Settings = () => {
           className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded p-8 w-96 overflow-y-scroll max-h-screen"
           style={{
             zIndex: 4000,
+            isolation: 'isolate',
           }}
         >
           <div className="absolute top-0 right-0">

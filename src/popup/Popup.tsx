@@ -7,7 +7,7 @@ import { useStorageSyncState } from './lib/useStorageSyncState'
 import { LoadedContent } from './LoadedContent'
 import { useEffect, useState } from 'react'
 
-const version = '_V3'
+const version = '_V4'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR' + version
 const IS_ACTIVE = 'IS_ACTIVE' + version
 const DELAY_ON_HIDE = 'DELAY_ON_HIDE' + version
