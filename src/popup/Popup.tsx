@@ -67,6 +67,14 @@ function App() {
     hidePiecesHandler()
   }, [pieces])
 
+  useEffect(() => {
+    if (!isActive) {
+      handleShowAllPieces()
+    } else {
+      hidePiecesHandler()
+    }
+  }, [isActive])
+
   return (
     <AppStateContext.Provider
       value={{
