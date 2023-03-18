@@ -44,14 +44,11 @@ function App() {
     setHidingInterval,
   })
 
-  useEffect(() => {
-    console.log('hidingInterval', hidingInterval)
-  }, [hidingInterval])
-
   // hide pieces on load
   const hidePiecesHandler = useCallback(() => {
     if (!isActive) return handleShowAllPieces()
     if (pieces === undefined) return
+
     hidePieces(delayOnHide)
   }, [delayOnHide, hidingInterval, isActive, pieces])
 
@@ -69,16 +66,10 @@ function App() {
 
   useEffect(() => {
     handleShowAllPieces()
-    hidePiecesHandler()
-  }, [pieces])
-
-  useEffect(() => {
-    if (!isActive) {
-      handleShowAllPieces()
-    } else {
+    if (isActive) {
       hidePiecesHandler()
     }
-  }, [isActive])
+  }, [isActive, pieces])
 
   return (
     <AppStateContext.Provider

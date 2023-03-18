@@ -152,7 +152,7 @@ export const useHidePieces = ({
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
       // if opacity is 0, then the piece is hidden
       if ((piece as HTMLElement).style.opacity === '0') return
-      ;(piece as HTMLElement).style.opacity = '0.7'
+      ;(piece as HTMLElement).style.opacity = '0.4'
     } else {
       ;(piece as HTMLElement).style.opacity = '1'
     }
@@ -184,11 +184,11 @@ export const useHidePieces = ({
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
       }, 150)
     }
-    clearCurrentInterval()
   }, [pieces])
 
   return (delayTime?: number) => {
     if (delayTime) {
+      clearCurrentInterval()
       setHidingInterval(
         window.setTimeout(() => {
           handleTimeout()
