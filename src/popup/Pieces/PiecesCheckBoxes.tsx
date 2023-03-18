@@ -4,7 +4,7 @@ import * as Tabs from '@radix-ui/react-tabs'
 import {
   CHESS_PIECE_COLORS,
   CHESS_PIECE_COLORS,
-  ChessPieceName,
+  CHESS_PIECE_NAMES,
   chessPieceColors,
   chessPieceNames,
   parseChessPieceIdentifier,
@@ -82,7 +82,7 @@ const Preset = ({
 
   const invertedPiecRow = (color: CHESS_PIECE_COLORS) =>
     Object.keys(chessPieceNames).map((n) => {
-      const name = n as ChessPieceName
+      const name = n as CHESS_PIECE_NAMES
       const piece = stringifyChessPieceIdentifier({ color, name })
       if (preset.data.has(piece)) return null
       return (
@@ -285,7 +285,7 @@ export default function PiecesCheckBoxes({
               </div>
             </div>
             {Object.keys(chessPieceNames).map((n) => {
-              const name = n as ChessPieceName
+              const name = n as CHESS_PIECE_NAMES
               return (
                 <div key={name} className="flex flex-row gap-1">
                   <div className="w-1/3">{name}</div>
@@ -295,7 +295,7 @@ export default function PiecesCheckBoxes({
                     return (
                       <div key={`${name}-${color}`} className="w-1/3">
                         <PieceCheckBox
-                          name={name as ChessPieceName}
+                          name={name as CHESS_PIECE_NAMES}
                           color={color as CHESS_PIECE_COLORS}
                           isChecked={
                             !checkedPieces?.has(stringifyChessPieceIdentifier({ name, color }))
