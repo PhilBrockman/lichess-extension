@@ -18,8 +18,6 @@ export const AppStateContext = createContext<{
   setDelayOnHide: () => {},
 })
 
-export type SavableTypes = Set<string> | object | number | string | boolean
-
 export const chessPieceNames = {
   pawn: true,
   knight: true,
@@ -34,8 +32,24 @@ export const chessPieceColors = {
   black: true,
 } as const
 
-export type ChessPieceName = keyof typeof chessPieceNames
-export type ChessPieceColor = keyof typeof chessPieceColors
+export type ChessPieceLocation = ChessPiece & {
+  originalPosition: HTMLElement
+}
+
+export type SavableTypes = Set<string> | object | number | string | boolean
+export enum CHESS_PIECE_COLORS {
+  WHITE = 'white',
+  BLACK = 'black',
+}
+
+export enum CHESS_PIECE_NAMES {
+  PAWN = 'pawn',
+  KNIGHT = 'knight',
+  BISHOP = 'bishop',
+  ROOK = 'rook',
+  QUEEN = 'queen',
+  KING = 'king',
+}
 
 export type SerializedChessPiece = {
   row: number
@@ -46,10 +60,6 @@ export type SerializedChessPiece = {
 }
 
 export type ChessPiece = {
-  name: ChessPieceName
-  color: ChessPieceColor
-}
-
-export type ChessPieceLocation = ChessPiece & {
-  originalPosition: HTMLElement
+  name: CHESS_PIECE_NAMES
+  color: CHESS_PIECE_COLORS
 }

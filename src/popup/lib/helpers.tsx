@@ -1,17 +1,4 @@
-export type SavableTypes = Set<string> | object | number | string | boolean
-export enum CHESS_PIECE_COLORS {
-  WHITE = 'white',
-  BLACK = 'black',
-}
-
-export enum CHESS_PIECE_NAMES {
-  PAWN = 'pawn',
-  KNIGHT = 'knight',
-  BISHOP = 'bishop',
-  ROOK = 'rook',
-  QUEEN = 'queen',
-  KING = 'king',
-}
+import { CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, ChessPiece } from './types'
 
 export const allCombinationsOfChessPieces = () => {
   const allCombinations: ChessPiece[] = []
@@ -24,19 +11,6 @@ export const allCombinationsOfChessPieces = () => {
     }
   }
   return new Set(allCombinations.map(stringifyChessPieceIdentifier))
-}
-
-export type SerializedChessPiece = {
-  row: number
-  column: string
-  color: string
-  pieceName: string
-  originalPosition: any
-}
-
-export type ChessPiece = {
-  name: CHESS_PIECE_NAMES
-  color: CHESS_PIECE_COLORS
 }
 
 export const isValidColor = (color: string): color is CHESS_PIECE_COLORS => {
