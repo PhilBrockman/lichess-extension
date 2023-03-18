@@ -55,15 +55,10 @@ export function HiddenPiece(piece: SerializedChessPiece) {
     }
   }
 
-  const handleMouseLeave = () => {
-    piece.originalPosition.style.opacity = '0'
-  }
-
   return (
     <button
-      className="w-full flex flex-row gap-2 items-center cursor-pointer px-2 py-1 rounded-lg border border-1 border-gray-300  bg-gray-200 hover:bg-gray-300 transition-all hover:border-gray-400 hover:shadow-lg active:bg-gray-400 active:border-gray-500 active:scale-95 scale-100 duration-100"
       onClick={handleClick}
-      onMouseLeave={handleMouseLeave}
+      className="w-full flex flex-row gap-2 items-center  px-2 py-1 rounded-lg border border-1 border-gray-300  bg-gray-200 hover:bg-gray-300 transition-all hover:border-gray-400 hover:shadow-lg active:bg-gray-400 active:border-gray-500 active:scale-95 scale-100 duration-100"
     >
       <img src={url} className="w-8 h-8" />
       <span>

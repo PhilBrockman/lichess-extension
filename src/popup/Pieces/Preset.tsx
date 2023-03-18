@@ -40,6 +40,7 @@ export function Preset({
   preset,
   setCheckedPieces,
   isActive,
+  action,
 }: {
   preset: {
     label: string
@@ -48,6 +49,7 @@ export function Preset({
   }
   setCheckedPieces: (pieces: Set<string>) => void
   isActive: boolean
+  action?: () => void
 }) {
   const commonClasses =
     'relative flex flex-col flex-grow-0 items-center justify-center gap-1 p-3 rounded-md border '
@@ -77,7 +79,13 @@ export function Preset({
     <div className="relative">
       <div
         className={commonClasses + (isActive ? activeClasses : inactiveClasses)}
-        onClick={() => setCheckedPieces(preset.data)}
+        onClick={() => {
+          if (action) {
+            action()
+          } else {
+            setCheckedPieces(preset.data)
+          }
+        }}
         role="button"
       >
         <div className="text-center text-xl">{preset.label}</div>

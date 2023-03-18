@@ -61,6 +61,7 @@ type Preset = {
   label: string
   helper: string
   data: Set<string>
+  action?: () => void
 }
 
 function areSetsEqual(set1: Set<string>, set2: Set<string>) {
@@ -100,13 +101,13 @@ export default function PiecesCheckBoxes({
   pieces: Set<string>
   onChange: (pieces: Set<string>) => void
 }) {
-  const { delayOnHide, setDelayOnHide, reset } = useContext(AppStateContext)
+  const { delayOnHide, setDelayOnHide, reset, setIsActive } = useContext(AppStateContext)
   const [checkedPieces, setCheckedPieces] = useState(pieces)
 
   useEffect(() => {
     onChange(checkedPieces)
   }, [checkedPieces])
-  const preconfigured = [
+  const preconfigured: (Preset[] | Preset)[] = [
     ALL_HIDDEN,
     PAWNS_ONLY,
     PAWN_PARTY,
@@ -115,6 +116,9 @@ export default function PiecesCheckBoxes({
       label: 'Show all pieces',
       helper: 'Always show all pieces',
       data: new Set<string>([]),
+      action: () => {
+        setIsActive(false)
+      },
     },
   ]
   const isUsingPreconfigured = preconfigured.some((p) => {
@@ -178,6 +182,7 @@ export default function PiecesCheckBoxes({
                   preset={p}
                   setCheckedPieces={setCheckedPieces}
                   isActive={areSetsEqual(checkedPieces, p.data)}
+                  action={p.action}
                 />
               )
 
