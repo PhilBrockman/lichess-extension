@@ -14,8 +14,8 @@ document.head.appendChild(linkElement)
 
 // Create a container element in the DOM where you can render your component
 const container = document.createElement('div')
-const element = document.querySelector('.puzzle__moves.areplay')
-element?.appendChild(container)
+const element = document.querySelectorAll('.puzzle__moves.areplay, .analyse__moves.areplay')
+element?.[0].appendChild(container)
 
 // const element = document.querySelector('.puzzle__board.main-board')
 // // append "flex and flex-row" to the classList

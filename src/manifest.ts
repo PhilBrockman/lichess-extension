@@ -5,7 +5,7 @@ export default defineManifest({
   description:
     'This extension hides a combination of the chess pieces on the board, making parts of the position invisible to the player. ',
 
-  version: '0.7.1',
+  version: '1.1.2',
   manifest_version: 3,
   icons: {
     '16': 'img/img-16.png',
@@ -20,7 +20,7 @@ export default defineManifest({
   // options_page: 'options.html',
   content_scripts: [
     {
-      matches: ['https://lichess.org/training/*'],
+      matches: ['https://lichess.org/*'],
       js: ['src/content/index.tsx'],
     },
   ],

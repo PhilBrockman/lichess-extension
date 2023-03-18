@@ -1,6 +1,6 @@
 {
   "name": "pawn-party",
-  "version": "0.7.1",
+  "version": "1.1.2",
   "author": "Phil Brockman",
   "description": "This extension hides all the chess pieces on the board, making the position invisible to the player. This means that you have to rely on your visualization skills and memory to play chess. It's a great way to improve your visualization skills and memory.",
   "type": "module",
