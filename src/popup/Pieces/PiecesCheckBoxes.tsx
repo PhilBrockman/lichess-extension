@@ -100,7 +100,7 @@ export default function PiecesCheckBoxes({
   pieces: Set<string>
   onChange: (pieces: Set<string>) => void
 }) {
-  const { delayOnHide, setDelayOnHide } = useContext(AppStateContext)
+  const { delayOnHide, setDelayOnHide, reset } = useContext(AppStateContext)
   const [checkedPieces, setCheckedPieces] = useState(pieces)
 
   useEffect(() => {
@@ -280,21 +280,65 @@ export default function PiecesCheckBoxes({
         className="grow p-5 bg-white rounded-b-md outline-none focus:shadow-[0_0_0_2px] focus:shadow-black"
         value="tab3"
       >
-        <div className="ml-3 space-y-3">
-          <p>Choose how long to delay hiding the pieces</p>
-          <div className="flex flex-row items-center gap-2">
-            <label htmlFor="delay-on-hide">{delayOnHide / 1000} seconds</label>
-            <input
-              type="range"
-              min="0"
-              max="10"
-              step={0.1}
-              value={delayOnHide / 1000}
-              onChange={(e) => setDelayOnHide(e.target.valueAsNumber * 1000)}
-            />
-          </div>
-        </div>
+        <Reset />
       </Tabs.Content>
     </Tabs.Root>
+  )
+}
+
+const Reset = () => {
+  const { setDelayOnHide, delayOnHide, reset } = useContext(AppStateContext)
+  const [hasConfirmedReset, setHasConfirmedReset] = useState(false)
+  return (
+    <div className="ml-3 space-y-5">
+      <fieldset className="border border-mauve6 rounded-md p-2">
+        <legend>Delay</legend>
+        <p className="text-gray-300 hover:text-gray-500 hover:border-2 hover:border-gray-300 hover:bg-gray-100 rounded-md p-2">
+          Choose how long to delay hiding the pieces (in seconds):
+        </p>
+        <div className="flex flex-row items-center gap-2">
+          <label htmlFor="delay-on-hide">{delayOnHide / 1000}</label>
+          <input
+            type="range"
+            min="0"
+            max="10"
+            step={0.1}
+            value={delayOnHide / 1000}
+            onChange={(e) => setDelayOnHide(e.target.valueAsNumber * 1000)}
+          />
+        </div>
+      </fieldset>
+      <fieldset>
+        <div className="flex flex-row items-center justify-between">
+          <div>
+            <button
+              className={`${
+                hasConfirmedReset
+                  ? 'hidden'
+                  : 'bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+              }`}
+              onClick={() => setHasConfirmedReset(true)}
+            >
+              Remove all stored settings
+            </button>
+          </div>
+          <div>
+            <button
+              className={`${
+                hasConfirmedReset
+                  ? 'bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+                  : 'hidden'
+              }`}
+              onClick={() => {
+                reset()
+                setHasConfirmedReset(false)
+              }}
+            >
+              Confirm and close
+            </button>
+          </div>
+        </div>
+      </fieldset>
+    </div>
   )
 }

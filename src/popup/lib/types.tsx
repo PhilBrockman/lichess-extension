@@ -8,6 +8,7 @@ export const AppStateContext = createContext<{
   setIsActive: (isActive: boolean) => void
   delayOnHide: number
   setDelayOnHide: (delayOnHide: number) => void
+  reset: () => void
 }>({
   pieces: new Set(),
   setPieces: () => {},
@@ -16,6 +17,7 @@ export const AppStateContext = createContext<{
   setIsActive: () => {},
   delayOnHide: 300,
   setDelayOnHide: () => {},
+  reset: () => {},
 })
 
 export type ChessPieceLocation = ChessPiece & {

@@ -35,14 +35,24 @@ export function useStorageSyncState<T extends SavableTypes>(key: string, default
     })
   }, [])
 
-  const debouncedWriteToStorage = debounce((value: T) => {
-    chrome.storage.sync.set({ [key]: stringify(value) }, () => {})
-  }, 300)
+  useEffect(() => {
+    const debouncedFn = debounce(() => {
+      chrome.storage.sync.set(
+        { [key]: state === undefined ? undefined : stringify(state) },
+        () => {},
+      )
+    }, 300)
 
-  const setStorageState = (value: T) => {
-    setState(value)
-    debouncedWriteToStorage(value)
+    debouncedFn()
+
+    return () => {
+      debouncedFn.cancel()
+    }
+  }, [state])
+
+  const reset = () => {
+    setState(defaultValue)
   }
 
-  return [state ?? defaultValue, setStorageState] as const
+  return [state ?? defaultValue, setState, reset] as const
 }
