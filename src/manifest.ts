@@ -1,11 +1,11 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
-  name: 'pawn-party',
+  name: 'Pawn Party',
   description:
     'This extension hides a combination of the chess pieces on the board, making parts of the position invisible to the player. ',
 
-  version: '1.1.2',
+  version: '1.1.3',
   manifest_version: 3,
   icons: {
     '16': 'img/img-16.png',
@@ -20,7 +20,7 @@ export default defineManifest({
   // options_page: 'options.html',
   content_scripts: [
     {
-      matches: ['https://lichess.org/*'],
+      matches: ['https://lichess.org/training/*', 'https://lichess.org/study/*'],
       js: ['src/content/index.tsx'],
     },
   ],
