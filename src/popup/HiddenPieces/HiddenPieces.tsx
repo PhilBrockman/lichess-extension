@@ -1,4 +1,4 @@
-import { SerializedChessPiece } from '../types'
+import { SerializedChessPiece } from '../lib/types'
 import { HiddenPiece } from './HiddenPiece'
 
 export function HiddenPieces({ pieces }: { pieces: SerializedChessPiece[] }) {

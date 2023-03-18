@@ -8,7 +8,7 @@ import {
   chessPieceNames,
   parseChessPieceIdentifier,
   stringifyChessPieceIdentifier,
-} from '../types'
+} from '../lib/types'
 import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
 
 const ALL_HIDDEN = {

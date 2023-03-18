@@ -1,20 +1,12 @@
-export type SavableTypes = Set<string> | object | number | string | boolean
+import {
+  ChessPiece,
+  chessPieceNames,
+  chessPieceColors,
+  ChessPieceName,
+  ChessPieceColor,
+} from './types'
 
-export const chessPieceNames = {
-  pawn: true,
-  knight: true,
-  bishop: true,
-  rook: true,
-  queen: true,
-  king: true,
-} as const
-
-export const chessPieceColors = {
-  white: true,
-  black: true,
-} as const
-
-export const allCombinationsOfChessPieces = () => {
+export function allCombinationsOfChessPieces() {
   const allCombinations: ChessPiece[] = []
   for (const pieceName of Object.keys(chessPieceNames)) {
     for (const pieceColor of Object.keys(chessPieceColors)) {
@@ -25,22 +17,6 @@ export const allCombinationsOfChessPieces = () => {
     }
   }
   return new Set(allCombinations.map(stringifyChessPieceIdentifier))
-}
-
-export type ChessPieceName = keyof typeof chessPieceNames
-export type ChessPieceColor = keyof typeof chessPieceColors
-
-export type SerializedChessPiece = {
-  row: number
-  column: string
-  color: string
-  pieceName: string
-  originalPosition: any
-}
-
-export type ChessPiece = {
-  name: ChessPieceName
-  color: ChessPieceColor
 }
 
 export const isValidColor = (color: string): color is ChessPieceColor => {
@@ -61,8 +37,4 @@ export const parseChessPieceIdentifier = (piece: string): ChessPiece => {
     color,
     name,
   }
-}
-
-export type ChessPieceLocation = ChessPiece & {
-  originalPosition: HTMLElement
 }
