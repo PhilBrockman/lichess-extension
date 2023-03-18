@@ -1,5 +1,10 @@
-import { allCombinationsOfChessPieces } from './lib/helpers'
-import { useHidePieces, showAllPieces } from './lib/hidePieces'
+import { allCombinationsOfChessPieces, stringifyChessPieceIdentifier } from './lib/helpers'
+import {
+  useHidePieces,
+  showAllPieces,
+  classNamesToChessPiece,
+  getChessPieceLocation,
+} from './lib/hidePieces'
 import _ from 'lodash'
 import { puzzleObserver } from './lib/basicObserver'
 import { AppStateContext, SerializedChessPiece } from './lib/types'
@@ -28,36 +33,49 @@ function App() {
 
   // local state
   const [hiddenPieces, setHiddenPieces] = useState<SerializedChessPiece[]>()
-  const [hidingInterval, setHidingInterval] = useState<number | undefined>()
   const handleShowAllPieces = () => {
     showAllPieces()
     setHiddenPieces([])
   }
-  const clearCurrentInterval = () => {
-    clearInterval(hidingInterval)
-    setHidingInterval(undefined)
-  }
-  const hidePieces = useHidePieces({
+  const { hidePieces } = useHidePieces({
     PIECES_THAT_I_CAN_HIDE: pieces,
-    setHiddenPieces,
-    clearCurrentInterval,
-    setHidingInterval,
+    delayTime: delayOnHide,
+    isActive,
   })
 
   // hide pieces on load
   const hidePiecesHandler = useCallback(() => {
     if (!isActive) return handleShowAllPieces()
     if (pieces === undefined) return
+    const pieceElements = document.querySelectorAll('piece')
+    const newHiddenPieces = Array.from(pieceElements)
+      .map((piece) => {
+        const chessPiece = classNamesToChessPiece(piece.className)
+        if (!chessPiece) {
+          return {
+            chessPiece: undefined,
+            piece: undefined,
+          }
+        }
+        return { chessPiece, piece }
+      })
+      .filter(
+        ({ chessPiece }) => chessPiece && pieces.has(stringifyChessPieceIdentifier(chessPiece)),
+      )
+      .map(
+        ({ piece }) => piece && getChessPieceLocation(piece as HTMLElement),
+      ) as SerializedChessPiece[]
 
-    hidePieces(delayOnHide)
-  }, [delayOnHide, hidingInterval, isActive, pieces])
+    setHiddenPieces(newHiddenPieces)
+    hidePieces()
+  }, [delayOnHide, isActive, pieces])
 
   useEffect(() => {
     const obs = puzzleObserver({
       newPuzzleCallback: () => {
         handleShowAllPieces()
       },
-      pieceCallback: _.debounce(hidePiecesHandler, 300, { leading: true, trailing: true }),
+      pieceCallback: _.debounce(hidePiecesHandler, 100, { leading: true, trailing: true }),
     })
     return () => {
       obs?.disconnect()

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { stringifyChessPieceIdentifier } from './helpers'
 import { ChessPiece, CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, SerializedChessPiece } from './types'
 
@@ -93,7 +93,7 @@ function getTransformDirections(transform: string) {
   return [parseInt(x), parseInt(y)]
 }
 
-function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undefined {
+export function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undefined {
   // Get the width and height of the chessboard
   const { width, height } = getChessBoardDimensions()
 
@@ -119,7 +119,7 @@ function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undef
   }
 }
 
-const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
+export const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
   const [color, pieceName] = classNames.split(' ') as [CHESS_PIECE_COLORS, CHESS_PIECE_NAMES]
   if (Object.values(CHESS_PIECE_COLORS).indexOf(color) === -1) return undefined
   if (Object.values(CHESS_PIECE_NAMES).indexOf(pieceName) === -1) return undefined
@@ -131,15 +131,20 @@ const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
 
 export const useHidePieces = ({
   PIECES_THAT_I_CAN_HIDE,
-  setHiddenPieces,
-  clearCurrentInterval,
-  setHidingInterval,
+  delayTime,
+  isActive,
 }: {
   PIECES_THAT_I_CAN_HIDE: Set<string>
-  setHiddenPieces: any
-  clearCurrentInterval: () => void
-  setHidingInterval: (interval: number) => void
+  delayTime: number
+  isActive: boolean
 }) => {
+  const [triggerEffect, setTriggerEffect] = useState(false)
+  const triggerRef = useRef(false)
+
+  useEffect(() => {
+    triggerRef.current = triggerEffect
+  }, [triggerEffect])
+
   const pieces = document.querySelectorAll('piece')
   // Set the initial opacity of the pieces
   pieces.forEach((piece) => {
@@ -151,6 +156,10 @@ export const useHidePieces = ({
 
     if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
       // if opacity is 0, then the piece is hidden
+      if (!isActive) {
+        ;(piece as HTMLElement).style.opacity = '1'
+        return
+      }
       if ((piece as HTMLElement).style.opacity === '0') return
       ;(piece as HTMLElement).style.opacity = '0.4'
     } else {
@@ -159,24 +168,18 @@ export const useHidePieces = ({
   })
 
   const handleTimeout = useCallback(() => {
-    const hiddenPieces: SerializedChessPiece[] = []
     pieces.forEach((piece) => {
       if (piece.className.indexOf('ghost') !== -1) return
-
       // Convert piece to a chess piece
       const chessPiece = classNamesToChessPiece(piece.className)
       if (!chessPiece) return
-
       if (PIECES_THAT_I_CAN_HIDE.has(stringifyChessPieceIdentifier(chessPiece))) {
         // Hide the piece
         ;(piece as HTMLElement).style.opacity = '0'
-        const loc = getChessPieceLocation(piece as HTMLElement)
-        if (loc) hiddenPieces.push(loc)
       } else {
         ;(piece as HTMLElement).style.opacity = '1'
       }
     })
-    setHiddenPieces(hiddenPieces)
 
     const container = document.querySelector('.puzzle__moves.areplay')
     if (container) {
@@ -186,17 +189,18 @@ export const useHidePieces = ({
     }
   }, [pieces])
 
-  return (delayTime?: number) => {
-    if (delayTime) {
-      clearCurrentInterval()
-      setHidingInterval(
-        window.setTimeout(() => {
-          handleTimeout()
-        }, delayTime),
-      )
-    } else {
-      handleTimeout()
+  useEffect(() => {
+    if (triggerRef.current && isActive) {
+      const intervalId = setInterval(() => {
+        handleTimeout()
+      }, delayTime)
+
+      return () => clearInterval(intervalId)
     }
+  }, [triggerRef, handleTimeout, delayTime, isActive])
+
+  return {
+    hidePieces: () => setTriggerEffect(true),
   }
 }
 
