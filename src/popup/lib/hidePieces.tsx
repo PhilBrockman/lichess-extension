@@ -1,17 +1,16 @@
+import { stringifyChessPieceIdentifier } from './helpers'
 import {
   ChessPiece,
-  CHESS_PIECE_COLORS,
+  ChessPieceColor,
   SerializedChessPiece,
-  CHESS_PIECE_NAMES,
-  stringifyChessPieceIdentifier,
-} from '../types'
+  chessPieceColors,
+  chessPieceNames,
+} from './types'
 
-function getBoardOrientation(): CHESS_PIECE_COLORS {
+function getBoardOrientation(): ChessPieceColor {
   const boardParent = document.querySelector('cg-container')?.parentElement
   if (!boardParent) throw new Error('Could not find board parent')
-  return boardParent.classList.contains('orientation-white')
-    ? CHESS_PIECE_COLORS.WHITE
-    : CHESS_PIECE_COLORS.BLACK
+  return boardParent.classList.contains('orientation-white') ? 'white' : 'black'
 }
 
 function getChessPiecePosition(
@@ -122,10 +121,12 @@ function getChessPieceLocation(piece: HTMLElement): SerializedChessPiece | undef
 }
 
 const classNamesToChessPiece = (classNames: string): ChessPiece | undefined => {
-  const [color, pieceName] = classNames.split(' ') as [CHESS_PIECE_COLORS, CHESS_PIECE_NAMES]
-
-  if (!Object.keys(CHESS_PIECE_COLORS).includes(color)) return undefined
-  if (!Object.keys(CHESS_PIECE_NAMES).includes(pieceName)) return undefined
+  const [color, pieceName] = classNames.split(' ') as [
+    keyof typeof chessPieceColors,
+    keyof typeof chessPieceNames,
+  ]
+  if (chessPieceNames[pieceName] === undefined) return undefined
+  if (chessPieceColors[color] === undefined) return undefined
   return {
     color: color,
     name: pieceName,

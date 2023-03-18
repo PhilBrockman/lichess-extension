@@ -1,4 +1,5 @@
-import { ChessPiece, SerializedChessPiece, isValidColor, isValidName } from '../types'
+import { isValidColor, isValidName } from '../lib/helpers'
+import { ChessPiece, SerializedChessPiece } from '../lib/types'
 
 export const urlFromPiece = (piece: ChessPiece) => {
   const images = {
@@ -29,18 +30,19 @@ export const urlFromPiece = (piece: ChessPiece) => {
 }
 
 export function HiddenPiece(piece: SerializedChessPiece) {
-  if (piece.color === 'ghost') {
+  const color = piece.color
+  if (color === 'ghost') {
     return null
   }
-  if (!isValidColor(piece.color)) {
-    throw new Error('Invalid color: ' + piece.color!)
+  if (!isValidColor(color)) {
+    throw new Error('Invalid color: ' + color!)
   }
   if (!isValidName(piece.pieceName)) {
     throw new Error('Invalid name: ' + piece.pieceName)
   }
 
   const url = urlFromPiece({
-    color: piece.color,
+    color: color,
     name: piece.pieceName,
   })
 

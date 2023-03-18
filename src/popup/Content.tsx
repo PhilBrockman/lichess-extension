@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import PiecesCheckBoxes from './Pieces/PiecesCheckBoxes'
-import { SerializedChessPiece } from './types'
+import { SerializedChessPiece } from './lib/types'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 import _ from 'lodash'
 

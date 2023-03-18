@@ -1,4 +1,4 @@
-import { CHESS_PIECE_COLORS, SerializedChessPiece } from '../types'
+import { CHESS_PIECE_COLORS, SerializedChessPiece } from '../lib/types'
 import { HiddenPiece } from './HiddenPiece'
 
 export function HiddenPieces({ pieces }: { pieces: SerializedChessPiece[] }) {

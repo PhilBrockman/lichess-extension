@@ -1,5 +1,4 @@
 export type SavableTypes = Set<string> | object | number | string | boolean
-
 export enum CHESS_PIECE_COLORS {
   WHITE = 'white',
   BLACK = 'black',
@@ -58,8 +57,4 @@ export const parseChessPieceIdentifier = (piece: string): ChessPiece => {
     color,
     name,
   }
-}
-
-export type ChessPieceLocation = ChessPiece & {
-  originalPosition: HTMLElement
 }
