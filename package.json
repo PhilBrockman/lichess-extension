@@ -24,6 +24,7 @@
     "@radix-ui/react-alert-dialog": "^1.0.2",
     "@radix-ui/react-dialog": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.2",
+    "@radix-ui/react-tooltip": "^1.0.5",
     "@types/chrome": "^0.0.218",
     "lodash": "^4.17.21",
     "react": "^18.2.0",

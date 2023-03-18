@@ -1,30 +1,24 @@
-import {
-  ChessPiece,
-  chessPieceNames,
-  chessPieceColors,
-  ChessPieceName,
-  ChessPieceColor,
-} from './types'
+import { CHESS_PIECE_COLORS, CHESS_PIECE_NAMES, ChessPiece } from './types'
 
-export function allCombinationsOfChessPieces() {
+export const allCombinationsOfChessPieces = () => {
   const allCombinations: ChessPiece[] = []
-  for (const pieceName of Object.keys(chessPieceNames)) {
-    for (const pieceColor of Object.keys(chessPieceColors)) {
+  for (const pieceName of Object.values(CHESS_PIECE_NAMES)) {
+    for (const pieceColor of Object.values(CHESS_PIECE_COLORS)) {
       allCombinations.push({
-        name: pieceName as ChessPieceName,
-        color: pieceColor as ChessPieceColor,
+        name: pieceName,
+        color: pieceColor,
       })
     }
   }
   return new Set(allCombinations.map(stringifyChessPieceIdentifier))
 }
 
-export const isValidColor = (color: string): color is ChessPieceColor => {
-  return chessPieceColors[color as ChessPieceColor] !== undefined
+export const isValidColor = (color: string): color is CHESS_PIECE_COLORS => {
+  return Object.values(CHESS_PIECE_COLORS).includes(color as CHESS_PIECE_COLORS)
 }
 
-export const isValidName = (name: string): name is ChessPieceName => {
-  return chessPieceNames[name as ChessPieceName] !== undefined
+export const isValidName = (name: string): name is CHESS_PIECE_NAMES => {
+  return Object.values(CHESS_PIECE_NAMES).includes(name as CHESS_PIECE_NAMES)
 }
 
 export const stringifyChessPieceIdentifier = (piece: ChessPiece) => {
@@ -32,7 +26,7 @@ export const stringifyChessPieceIdentifier = (piece: ChessPiece) => {
 }
 
 export const parseChessPieceIdentifier = (piece: string): ChessPiece => {
-  const [color, name] = piece.split('_') as [ChessPieceColor, ChessPieceName]
+  const [color, name] = piece.split('_') as [CHESS_PIECE_COLORS, CHESS_PIECE_NAMES]
   return {
     color,
     name,

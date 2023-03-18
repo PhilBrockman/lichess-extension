@@ -1,6 +1,6 @@
 import { urlFromPiece } from '../HiddenPieces/HiddenPiece'
 import { stringifyChessPieceIdentifier } from '../lib/helpers'
-import { ChessPieceColor, ChessPieceName } from '../lib/types'
+import { CHESS_PIECE_COLORS, CHESS_PIECE_NAMES } from '../lib/types'
 
 export default function PieceCheckBox({
   isChecked,
@@ -8,8 +8,8 @@ export default function PieceCheckBox({
   name,
   color,
 }: {
-  name: ChessPieceName
-  color: ChessPieceColor
+  name: CHESS_PIECE_NAMES
+  color: CHESS_PIECE_COLORS
   isChecked: boolean
   onChange: (pieceType: string) => void
 }) {
