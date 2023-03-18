@@ -1,16 +1,35 @@
-import { useEffect, useState } from 'react'
-import { SerializedChessPiece, allCombinationsOfChessPieces } from './types'
+import { createContext, useEffect, useState } from 'react'
+import { allCombinationsOfChessPieces } from './lib/helpers'
 import { HiddenPieces } from './HiddenPieces/HiddenPieces'
 import { hidePieces, showAllPieces } from './lib/hidePieces'
 import _ from 'lodash'
 import Settings from './Modal/Settings'
-import { useStorageSyncState } from './useStorageSyncState'
-import { basicObserver } from './basicObserver'
+import { basicObserver } from './lib/basicObserver'
+import { SerializedChessPiece } from './lib/types'
+import { useStorageSyncState } from './lib/useStorageSyncState'
 
 const version = '_V3'
 const PREFERRED_HIDDEN_PIECES = 'PREFERRED_HIDDEN_PIECES_BY_COLOR' + version
 const IS_ACTIVE = 'IS_ACTIVE' + version
 const DELAY_ON_HIDE = 'DELAY_ON_HIDE' + version
+
+export const AppStateContext = createContext<{
+  pieces: Set<string>
+  setPieces: (pieces: Set<string>) => void
+  hiddenPieces?: SerializedChessPiece[]
+  isActive: boolean
+  setIsActive: (isActive: boolean) => void
+  delayOnHide: number
+  setDelayOnHide: (delayOnHide: number) => void
+}>({
+  pieces: new Set(),
+  setPieces: () => {},
+  hiddenPieces: [],
+  isActive: false,
+  setIsActive: () => {},
+  delayOnHide: 300,
+  setDelayOnHide: () => {},
+})
 
 function App() {
   // saved settings
@@ -58,17 +77,29 @@ function App() {
   }, [pieces, isActive])
 
   return (
-    <div className="space-y-3" style={{ zIndex: 1000 }}>
-      <div className="text-sm font-medium text-center text-gray-500 border-gray-200 py-3 ">
-        <Content
-          isActive={isActive}
-          pieces={pieces}
-          setPieces={setPieces}
-          hiddenPieces={hiddenPieces}
-          setIsActive={setIsActive}
-        />
+    <AppStateContext.Provider
+      value={{
+        pieces,
+        setPieces,
+        hiddenPieces,
+        isActive,
+        setIsActive,
+        delayOnHide,
+        setDelayOnHide,
+      }}
+    >
+      <div className="space-y-3" style={{ zIndex: 1000 }}>
+        <div className="text-sm font-medium text-center text-gray-500 border-gray-200 py-3 ">
+          <Content
+            isActive={isActive}
+            pieces={pieces}
+            setPieces={setPieces}
+            hiddenPieces={hiddenPieces}
+            setIsActive={setIsActive}
+          />
+        </div>
       </div>
-    </div>
+    </AppStateContext.Provider>
   )
 }
 
@@ -91,7 +122,7 @@ const Content = ({
         <div className="">
           {isActive ? (
             <div className="justify-between flex flex-row ">
-              <Settings pieces={pieces} setPieces={setPieces} />
+              <Settings />
               <div className="flex flex-row space-x-2">
                 {/* <a
                   href="https://chess.minuspieces.com/"

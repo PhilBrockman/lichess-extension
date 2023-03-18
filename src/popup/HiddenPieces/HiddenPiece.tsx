@@ -1,4 +1,4 @@
-import { ChessPiece, SerializedChessPiece, isValidColor, isValidName } from '../types'
+import { ChessPiece, SerializedChessPiece, isValidColor, isValidName } from '../lib/types'
 
 export const urlFromPiece = (piece: ChessPiece) => {
   const images = {

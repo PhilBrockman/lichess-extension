@@ -1,11 +1,11 @@
+import { stringifyChessPieceIdentifier } from './helpers'
 import {
   ChessPiece,
   ChessPieceColor,
   SerializedChessPiece,
   chessPieceColors,
   chessPieceNames,
-  stringifyChessPieceIdentifier,
-} from '../types'
+} from './types'
 
 function getBoardOrientation(): ChessPieceColor {
   const boardParent = document.querySelector('cg-container')?.parentElement
