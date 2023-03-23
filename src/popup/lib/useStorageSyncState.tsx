@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { SavableTypes } from './types'
 import { debounce } from 'lodash'
+import browser from 'webextension-polyfill'
 
 function savingOperations<T extends SavableTypes>(defaultValue: T) {
   if (defaultValue instanceof Set) {
@@ -26,21 +27,29 @@ export function useStorageSyncState<T extends SavableTypes>(key: string, default
   const [state, setState] = useState<T>()
 
   useEffect(() => {
-    chrome.storage.sync.get([key], (result) => {
-      if (result[key] !== undefined) {
-        setState(parse(result[key]))
-      } else {
-        setState(defaultValue)
-      }
-    })
+    browser.storage.sync
+      .get([key])
+      .then((result) => {
+        if (result[key] !== undefined) {
+          setState(parse(result[key]))
+        } else {
+          setState(defaultValue)
+        }
+      })
+      .catch((error) => {
+        console.error('Error getting storage value:', error)
+      })
   }, [])
 
   useEffect(() => {
     const debouncedFn = debounce(() => {
-      chrome.storage.sync.set(
-        { [key]: state === undefined ? undefined : stringify(state) },
-        () => {},
-      )
+      browser.storage.sync
+        .set({
+          [key]: state === undefined ? undefined : stringify(state),
+        })
+        .catch((error) => {
+          console.error('Error setting storage value:', error)
+        })
     }, 300)
 
     debouncedFn()
